@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM demo con TypeScript y esbuild
+
+Globals:
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 10
+    MemorySize: 128
+
+Resources:
+  TestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      # Files compiled by esbuild in dist/lambdas
+      Handler: dist/src/infrastructure/lambdas/createUserLambda.handler
+      Runtime: nodejs18.x
+      
+      PackageType: Zip
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /test
+            Method: post

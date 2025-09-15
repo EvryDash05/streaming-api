@@ -1,0 +1,32 @@
+{
+  "name": "streaming-api",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "node --loader ts-node/esm index.ts",
+    "build": "node esbuild.config.js",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.152",
+    "@types/dotenv": "^8.2.3",
+    "@types/node": "^24.3.0",
+    "esbuild": "^0.25.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@middy/core": "^6.4.4",
+    "@middy/http-error-handler": "^6.4.4",
+    "@middy/http-json-body-parser": "^6.4.4",
+    "jose": "^6.1.0",
+    "mysql2": "^3.14.4",
+    "zod": "^4.1.5"
+  }
+}

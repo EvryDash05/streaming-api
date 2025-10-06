@@ -1,18 +1,32 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    // File Layout
+    "rootDir": "./src",
+    "outDir": "./dist",
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    // Environment Settings
+    "target": "esnext",
+    "module": "nodenext",
+    "types": ["aws-lambda"],
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    // Other Outputs
+    "sourceMap": false,
+    "declaration": false,
+    "declarationMap": true,
+    "baseUrl": ".",
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    // Recommended Options
     "strict": true,
+    "verbatimModuleSyntax": false,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
     "skipLibCheck": true,
-    "outDir": "./dist"
   },
-  "ts-node": {
-    "esm": true,
-    "compiler": "typescript"
-  },
-  "include": ["src/**/*.ts", "index.ts"],
+  "include": ["src/**/*", "*.ts"],
   "exclude": ["node_modules"]
 }

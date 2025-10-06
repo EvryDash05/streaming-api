@@ -2,21 +2,36 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: SAM demo con TypeScript y esbuild
 
+Parameters:
+  DatabaseUrl:
+    Type: String
+    Description: "URL de conexión a la base de datos PostgreSQL"
+
 Globals:
   Function:
-    Runtime: nodejs18.x
+    Runtime: nodejs20.x
     Timeout: 10
     MemorySize: 128
+    Environment:
+      Variables:
+        DATABASE_URL: !Ref DatabaseUrl
 
 Resources:
   TestFunction:
     Type: AWS::Serverless::Function
     Properties:
-      # Files compiled by esbuild in dist/lambdas
-      Handler: dist/src/infrastructure/lambdas/createUserLambda.handler
-      Runtime: nodejs18.x
-      
+      CodeUri: dist/
+      Handler: lambdas/createUserLambda.handler
       PackageType: Zip
+      Environment:
+        Variables:
+          JWT_SECRET: ${env:JWT_SECRET}
+          JWT_EXPIRES_IN: ${env:JWT_EXPIRES_IN}
+          REFRESH_TOKEN_EXPIRES_IN: ${env:REFRESH_TOKEN_EXPIRES_IN}
+          APP_ENV: ${env:APP_ENV}
+          APP_PORT: ${env:APP_PORT}
+          BCRYPT_SALT_ROUNDS: ${env:BCRYPT_SALT_ROUNDS}
+          DATABASE_URL_SECRET_NAME: my-database-url-secret
       Events:
         ApiEvent:
           Type: Api

@@ -1,0 +1,207 @@
+generator client {
+   provider      = "prisma-client-js"
+   binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model authorities {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique @db.VarChar(100)
+  description      String?
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  role_authorities role_authorities[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model favorites {
+  id         Int       @id @default(autoincrement())
+  profile_id Int
+  video_id   Int
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  profiles   profiles  @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  videos     videos    @relation(fields: [video_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model playing_with_neon {
+  id    Int    @id @default(autoincrement())
+  name  String
+  value Float? @db.Real
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model producers {
+  id               Int       @id @default(autoincrement())
+  user_id          Int
+  institution_name String?   @db.VarChar(150)
+  description      String?
+  contact_email    String?   @db.VarChar(150)
+  contact_phone    String?   @db.VarChar(20)
+  penalty_score    Decimal?  @default(0.00) @db.Decimal(5, 2)
+  total_earnings   Decimal?  @default(0.00) @db.Decimal(10, 2)
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  updated_at       DateTime? @default(now()) @db.Timestamp(6)
+  users            users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  videos           videos[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model profiles {
+  id                  Int                @id @default(autoincrement())
+  user_id             Int
+  profile_name        String             @db.VarChar(100)
+  profile_picture_url String?            @db.VarChar(255)
+  profile_type        profile_type_enum? @default(standard)
+  preferred_language  String?            @db.VarChar(50)
+  favorite_genres     Json?
+  recommended_genres  Json?
+  created_at          DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?          @default(now()) @db.Timestamp(6)
+  favorites           favorites[]
+  users               users              @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  reviews             reviews[]
+  watch_history       watch_history[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reviews {
+  id         Int       @id @default(autoincrement())
+  profile_id Int
+  video_id   Int
+  rating     Int
+  comment    String?
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  profiles   profiles  @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  videos     videos    @relation(fields: [video_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model role_authorities {
+  role_id      Int
+  authority_id Int
+  authorities  authorities @relation(fields: [authority_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  roles        roles       @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([role_id, authority_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model roles {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique @db.VarChar(50)
+  description      String?
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  role_authorities role_authorities[]
+  user_roles       user_roles[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model subscriptions {
+  id             Int                       @id @default(autoincrement())
+  user_id        Int
+  price          Decimal                   @default(3.00) @db.Decimal(5, 2)
+  start_date     DateTime                  @db.Date
+  end_date       DateTime                  @db.Date
+  status         subscription_status_enum? @default(active)
+  created_by     String                    @db.VarChar(255)
+  created_at     DateTime?                 @default(now()) @db.Timestamp(6)
+  last_update_by String?                   @db.VarChar(255)
+  last_update_at DateTime?                 @default(now()) @db.Timestamp(6)
+  users          users                     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model user_details {
+  id                 Int       @id @default(autoincrement())
+  user_id            Int
+  full_name          String?   @db.VarChar(150)
+  phone_number       String?   @db.VarChar(20)
+  country            String?   @db.VarChar(50)
+  preferred_language String?   @db.VarChar(50)
+  created_by         String    @db.VarChar(255)
+  created_at         DateTime? @default(now()) @db.Timestamp(6)
+  last_update_by     String?   @db.VarChar(255)
+  last_update_at     DateTime? @default(now()) @db.Timestamp(6)
+  users              users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model user_roles {
+  user_id Int
+  role_id Int
+  roles   roles @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users   users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, role_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model users {
+  id            Int             @id @default(autoincrement())
+  email         String          @unique @db.VarChar(150)
+  password_hash String          @db.VarChar(255)
+  role          role_enum       @default(user)
+  created_at    DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?       @default(now()) @db.Timestamp(6)
+  producers     producers[]
+  profiles      profiles[]
+  subscriptions subscriptions[]
+  user_details  user_details[]
+  user_roles    user_roles[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model videos {
+  id              Int             @id @default(autoincrement())
+  producer_id     Int
+  title           String          @db.VarChar(200)
+  description     String?
+  url             String          @db.VarChar(255)
+  duration        Int?
+  category        String?         @db.VarChar(100)
+  views           Int?            @default(0)
+  likes           Int?            @default(0)
+  dislikes        Int?            @default(0)
+  penalty_applied Boolean?        @default(false)
+  created_by      String          @db.VarChar(255)
+  created_at      DateTime?       @default(now()) @db.Timestamp(6)
+  last_update_by  String?         @db.VarChar(255)
+  last_update_at  DateTime?       @default(now()) @db.Timestamp(6)
+  favorites       favorites[]
+  reviews         reviews[]
+  producers       producers       @relation(fields: [producer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  watch_history   watch_history[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model watch_history {
+  id         Int       @id @default(autoincrement())
+  profile_id Int
+  video_id   Int
+  watched_at DateTime? @default(now()) @db.Timestamp(6)
+  progress   Int?      @default(0)
+  profiles   profiles  @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  videos     videos    @relation(fields: [video_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+enum profile_type_enum {
+  standard
+  kids
+}
+
+enum role_enum {
+  user
+  producer
+}
+
+enum subscription_status_enum {
+  active
+  inactive
+  canceled
+}

@@ -1,16 +1,16 @@
 import { AuthLoginRequest } from "../../infrastructure/models/request/AuthLoginRequest.js";
-import { UserService } from "../service/UserService.js";
+import { PrismaClient } from "../../generated/prisma";
+import {UserService} from "../service/UserService";
 
 export class UserBusiness implements UserService {
 
     async createUser(request: AuthLoginRequest) {
 
+        const prisma = new PrismaClient();
         const { password, email } = request;
 
-        const response = {
-            message: 'Login success',
-            email
-        }
+        const response = await prisma.playing_with_neon.findMany();
+        console.log(response);
 
         return response;
     }

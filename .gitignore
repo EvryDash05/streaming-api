@@ -18,6 +18,7 @@ logs/
 
 # Env files
 .env
+env.json
 .env.local
 .env.*.local
 
@@ -35,3 +36,5 @@ Thumbs.db
 # Coverage / Tests
 coverage/
 .jest/
+
+/src/generated/prisma

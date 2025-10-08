@@ -8,7 +8,7 @@
     // Environment Settings
     "target": "esnext",
     "module": "nodenext",
-    "types": ["aws-lambda"],
+    "types": ["aws-lambda", "node"],
     "noImplicitAny": true,
     "moduleResolution": "node",
     // Other Outputs

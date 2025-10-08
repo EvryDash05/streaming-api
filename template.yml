@@ -1,40 +1,35 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: SAM demo con TypeScript y esbuild
-
-Parameters:
-  DatabaseUrl:
-    Type: String
-    Description: "URL de conexión a la base de datos PostgreSQL"
+Description: Stack principal del sistema
 
 Globals:
   Function:
     Runtime: nodejs20.x
     Timeout: 10
-    MemorySize: 128
     Environment:
       Variables:
-        DATABASE_URL: !Ref DatabaseUrl
+        NODE_ENV: development
+        # Security variables
+        SECURITY_JWT_KEY: some_jwt_key
+        SECURITY_JWT_ACCESS_EXPIRATION: some_access_expiration
+        SECURITY_JWT_REFRESH_EXPIRATION: some_refresh_expiration
+        SECURITY_JWT_USER_GENERATOR: some_user_generator
+        SECURITY_JWT_HASHED_SECRET: some_hashed_secret
+        BCRYPT_SALT_ROUNDS: some_number
+        # Database variables
+        DATABASE_URL: some_db_url
 
 Resources:
-  TestFunction:
-    Type: AWS::Serverless::Function
+  AuthStack:
+    Type: AWS::Serverless::Application
     Properties:
-      CodeUri: dist/
-      Handler: lambdas/createUserLambda.handler
-      PackageType: Zip
-      Environment:
-        Variables:
-          JWT_SECRET: ${env:JWT_SECRET}
-          JWT_EXPIRES_IN: ${env:JWT_EXPIRES_IN}
-          REFRESH_TOKEN_EXPIRES_IN: ${env:REFRESH_TOKEN_EXPIRES_IN}
-          APP_ENV: ${env:APP_ENV}
-          APP_PORT: ${env:APP_PORT}
-          BCRYPT_SALT_ROUNDS: ${env:BCRYPT_SALT_ROUNDS}
-          DATABASE_URL_SECRET_NAME: my-database-url-secret
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /test
-            Method: post
+      Location: ./src/infrastructure/lambdas/auth/template.yml
+      Parameters:
+        NODE_ENV: development
+        SECURITY_JWT_KEY: some_jwt_key
+        SECURITY_JWT_ACCESS_EXPIRATION: some_access_expiration
+        SECURITY_JWT_REFRESH_EXPIRATION: some_refresh_expiration
+        SECURITY_JWT_USER_GENERATOR: some_user_generator
+        SECURITY_JWT_HASHED_SECRET: some_hashed_secret
+        BCRYPT_SALT_ROUNDS: some_number
+        DATABASE_URL: some_db_url

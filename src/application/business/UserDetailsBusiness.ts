@@ -1,18 +1,23 @@
-import { AuthLoginRequest } from "../../infrastructure/models/request/AuthLoginRequest.js";
+
 import { PrismaClient } from "../../generated/prisma";
-import {UserService} from "../service/UserService";
+import { AuthRegisterRequest } from "../../infrastructure/models/request/auth/AuthRegisterRequest";
+import { UserDetailService } from "../service/UserDetailService";
 
-export class UserBusiness implements UserService {
+export class UserDetailsBusiness implements UserDetailService {
 
-    async createUser(request: AuthLoginRequest) {
+    async createUserDetail(request: AuthRegisterRequest, userId: number) {
+        
+        try {
+
+        } catch (error) {
+
+        }
 
         const prisma = new PrismaClient();
-        const { password, email } = request;
 
-        const response = await prisma.playing_with_neon.findMany();
-        console.log(response);
 
-        return response;
+
+        return "response";
     }
 
     findById(id: number) {

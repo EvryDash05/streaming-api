@@ -21,6 +21,7 @@ Parameters:
 
 Globals:
   Function:
+    Timeout: 30
     Environment:
       Variables:
         NODE_ENV: !Ref NODE_ENV

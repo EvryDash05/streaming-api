@@ -7,7 +7,9 @@
     "dev": "node --loader ts-node/esm index.ts",
     "build": "node esbuild.config.js",
     "start": "node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-env": "node scripts/generate-env.js",
+    "generate-env:example": "node scripts/generate-env.js --example"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +17,7 @@
   "description": "",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.152",
+    "@types/bcrypt": "^6.0.0",
     "@types/dotenv": "^8.2.3",
     "@types/node": "^24.6.2",
     "esbuild": "^0.25.9",
@@ -29,6 +32,7 @@
     "@middy/http-error-handler": "^6.4.4",
     "@middy/http-json-body-parser": "^6.4.4",
     "@prisma/client": "^6.16.3",
+    "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.3",
     "jose": "^6.1.0",
     "mysql2": "^3.14.4",

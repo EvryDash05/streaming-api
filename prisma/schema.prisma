@@ -1,6 +1,6 @@
 generator client {
-   provider      = "prisma-client-js"
-   binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -119,9 +119,9 @@ model subscriptions {
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model user_details {
   id                 Int       @id @default(autoincrement())
-  user_id            Int
+  user_id            Int       @unique
   full_name          String?   @db.VarChar(150)
-  phone_number       String?   @db.VarChar(20)
+  phone_number       String?   @unique @db.VarChar(20)
   country            String?   @db.VarChar(50)
   preferred_language String?   @db.VarChar(50)
   created_by         String    @db.VarChar(255)
@@ -152,7 +152,7 @@ model users {
   producers     producers[]
   profiles      profiles[]
   subscriptions subscriptions[]
-  user_details  user_details[]
+  user_details  user_details?
   user_roles    user_roles[]
 }
 

@@ -68,6 +68,7 @@ for (const file of lambdaFiles) {
     minify: process.env.NODE_ENV === "production",
     outfile: outPath,
     external: ["@prisma/client", ".prisma"],
+    resolveExtensions: [".ts", ".js", ".json"]
   });
 }
 

@@ -3,7 +3,7 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 import 'dotenv/config';
 import { AuthBusiness } from "../../../application/business/AuthBusiness";
 import { UserRepository } from '../../../domain/repository/userRepository';
-import { buildHttpResponse, LambdaResponse } from '../../../utils/HttpUtils';
+import { buildLambdaResponse, LambdaResponse } from '../../../utils/HttpUtils';
 import { errorHandlingMiddleware, jsonBodyParser, zodValidator } from "../../middlewares/zodValidator";
 import { AuthRegisterRequest } from "../../models/request/auth/AuthRegisterRequest";
 
@@ -15,7 +15,7 @@ export async function registerUserHandler(
 ): Promise<LambdaResponse> {
     const response = await new AuthBusiness(userRepository).register(event.body as unknown as AuthRegisterRequest);
     const statusCode = response.success ? 201 : 500;
-    return buildHttpResponse(statusCode, response);
+    return buildLambdaResponse(statusCode, response);
 }
 
 export const handler = middy(registerUserHandler)

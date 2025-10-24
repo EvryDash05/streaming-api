@@ -6,8 +6,35 @@ export interface LambdaResponse<T = any> {
     headers?: Record<string, string>;
 }
 
+export function successResponse<T = unknown>(
+    message: string,
+    data?: T | T[] | null,
+    statusCode = 200
+): BaseResponse<T> {
+    return {
+        success: true,
+        statusCode,
+        message,
+        data: data ?? null,
+        errors: null
+    };
+}
 
-export function buildHttpResponse<T = unknown>(
+export function errorResponse<T = unknown>(
+    message: string,
+    errors?: string | string[] | Record<string, any> | null,
+    statusCode = 400
+): BaseResponse<T> {
+    return {
+        success: false,
+        statusCode,
+        message,
+        data: null,
+        errors: errors ?? null
+    };
+}
+
+export function buildLambdaResponse<T = unknown>(
     statusCode: number,
     body: BaseResponse<T>
 ): LambdaResponse {

@@ -1,13 +1,13 @@
 import bycript from "bcryptjs";
+import { ProducerEntity } from "../../domain/entity/ProducersEntity";
 import { UserEntity } from "../../domain/entity/UsersEntity";
 import { Repository } from "../../domain/repository/Repository";
 import { AuthLoginRequest } from '../../infrastructure/models/request/auth/AuthLoginRequest';
 import { AuthRegisterRequest } from "../../infrastructure/models/request/auth/AuthRegisterRequest";
+import { ProducerRequest } from "../../infrastructure/models/request/ProducerRequest";
 import { BaseResponse } from "../../infrastructure/models/response/common/baseResponse";
 import { AuthService } from "../service/auth/AuthService";
-import { ProducerRequest } from "../../infrastructure/models/request/ProducerRequest";
-import { ProducerEntity } from "../../domain/entity/ProducersEntity";
-import { string } from "zod";
+import { errorResponse, successResponse } from "../../utils/HttpUtils";
 
 export class AuthBusiness implements AuthService {
 
@@ -24,27 +24,14 @@ export class AuthBusiness implements AuthService {
             const userEntity = this.mapToEntity(request, request.password_hash);
             await this.userRepository.save(userEntity);
 
-            return {
-                success: true,
-                message: "Usuario registrado con éxito",
-                statusCode: 201
-            };
+            return successResponse<void>("Usuario registrado con éxito", null, 201);
         } catch (error: any) {
             if (error.code === 'P2002') {
                 const field = error.meta.target[0];
-                return {
-                    success: false,
-                    message: `${field} ya está registrado`,
-                    statusCode: 409
-                };
+                return errorResponse(`${field} ya registrado`, [`${field} duplicado`], 409);
             }
 
-            return {
-                success: false,
-                message: "Error interno del servidor",
-                errors: error.message,
-                statusCode: 500
-            };
+            return errorResponse("Error interno del servidor", error.message, 500);
         }
     }
 

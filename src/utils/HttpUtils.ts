@@ -1,18 +1,16 @@
-import { BaseResponse } from "../infrastructure/models/response/common/baseResponse.js";
-import { ErrorResponse } from "../infrastructure/models/response/common/errorReponse.js";
+import { BaseResponse } from "../infrastructure/models/response/common/baseResponse";
 
-export function buildResponse<T>(message: string, data: T): BaseResponse<T> {
-    return { message, data };
+export interface LambdaResponse<T = any> {
+    statusCode: number;
+    body: string | T;
+    headers?: Record<string, string>;
 }
 
-export function buildErrorResponse(message: string, details?: any): ErrorResponse {
-    return { message, details };
-}
 
-export function buildHttpResponse<T>(
+export function buildHttpResponse<T = unknown>(
     statusCode: number,
-    body: BaseResponse<T> | ErrorResponse
-) {
+    body: BaseResponse<T>
+): LambdaResponse {
     return {
         statusCode,
         body: JSON.stringify(body),

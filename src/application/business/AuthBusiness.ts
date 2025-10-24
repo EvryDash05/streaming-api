@@ -1,61 +1,83 @@
 import bycript from "bcryptjs";
-import prisma from "../../infrastructure/database/prismaClient";
-import { AuthRegisterRequest } from "../../infrastructure/models/request/auth/AuthRegisterRequest";
-import { AuthService } from "../service/auth/AuthService";
-import { BussinessReponse } from '../../infrastructure/models/response/common/businessResponse';
+import { UserEntity } from "../../domain/entity/UsersEntity";
+import { Repository } from "../../domain/repository/Repository";
 import { AuthLoginRequest } from '../../infrastructure/models/request/auth/AuthLoginRequest';
+import { AuthRegisterRequest } from "../../infrastructure/models/request/auth/AuthRegisterRequest";
+import { BaseResponse } from "../../infrastructure/models/response/common/baseResponse";
+import { AuthService } from "../service/auth/AuthService";
+import { ProducerRequest } from "../../infrastructure/models/request/ProducerRequest";
+import { ProducerEntity } from "../../domain/entity/ProducersEntity";
+import { string } from "zod";
 
 export class AuthBusiness implements AuthService {
 
-    async register(request: AuthRegisterRequest): Promise<any> {
+    private readonly userRepository: Repository<UserEntity, number>;
+
+    public constructor(userRepository: Repository<UserEntity, number>) {
+        this.userRepository = userRepository;
+    }
+
+    async register(request: AuthRegisterRequest): Promise<BaseResponse<void>> {
         try {
-            const response = await prisma.$transaction(async (tx) => {
-                const { email, full_name, password_hash, country, phone_number, preferred_language } = request;
-                const encryptedPassword = await bycript.hash(password_hash, 10);
-                
-                console.log("Registering user:", request);
-                console.log("Encrypted password:", encryptedPassword);
-                await prisma.users.create({
-                    data: {
-                        email,
-                        password_hash: encryptedPassword,
-                        /* user_roles: {
-                            create: {
-                                roles: "user",
-                                role_id: 2
-                            }
-                        }, */
-                        user_details: {
-                            create: {
-                                full_name: full_name || null,
-                                country: country || null,
-                                phone_number: phone_number || null,
-                                preferred_language: preferred_language || null,
-                                created_by: "system"
-                            }
-                        }
-                    }
-                });
+            console.log('In register User')
+            request.password_hash = await bycript.hash(request.password_hash, 10);
+            const userEntity = this.mapToEntity(request, request.password_hash);
+            await this.userRepository.save(userEntity);
 
-                return { success: true, message: "Usuario registrado con éxito" };
-            });
-
-            return response;
+            return {
+                success: true,
+                message: "Usuario registrado con éxito",
+                statusCode: 201
+            };
         } catch (error: any) {
             if (error.code === 'P2002') {
                 const field = error.meta.target[0];
-                return { success: false, message: `${field} ya está registrado` };
+                return {
+                    success: false,
+                    message: `${field} ya está registrado`,
+                    statusCode: 409
+                };
             }
-            return { success: false, message: "Error interno del servidor", error: error.message };
+
+            return {
+                success: false,
+                message: "Error interno del servidor",
+                errors: error.message,
+                statusCode: 500
+            };
         }
     }
 
-    authenticate(request: AuthLoginRequest): Promise<BussinessReponse<string[]>> {
+    authenticate(request: AuthLoginRequest): Promise<BaseResponse<string[]>> {
         throw new Error("Method not implemented.");
     }
 
-    refreshToken(token: string): Promise<BussinessReponse<string[]>> {
+    refreshToken(token: string): Promise<BaseResponse<string[]>> {
         throw new Error("Method not implemented.");
+    }
+
+    private mapProducer(request?: ProducerRequest): ProducerEntity | undefined {
+        if (!request) return undefined
+        return {
+            institutionName: request?.institution_name ?? null,
+            description: request?.description ?? null,
+            contactEmail: request?.contact_email ?? null,
+            contactPhone: request?.contact_phone ?? null,
+        };
+    }
+
+    private mapToEntity(request: AuthRegisterRequest, passwordHash: string): UserEntity {
+        const userEntity: UserEntity = {
+            email: request.email || "",
+            passwordHash: passwordHash || "",
+            fullName: request.full_name || "",
+            phoneNumber: request.phone_number || "",
+            country: request.country || "",
+            preferredLanguage: request.preferred_language || "",
+            role: request.role as any,
+            producer: this.mapProducer(request.producerRequest)
+        };
+        return userEntity;
     }
 
 }

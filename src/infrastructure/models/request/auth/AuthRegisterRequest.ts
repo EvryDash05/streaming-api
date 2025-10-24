@@ -1,5 +1,5 @@
-import { count } from "console";
 import { z, ZodTypeAny } from "zod";
+import { ProducerRequest } from "../ProducerRequest";
 
 export class AuthRegisterRequest {
     public email: string;
@@ -8,6 +8,8 @@ export class AuthRegisterRequest {
     public phone_number?: string;
     public country?: string;
     public preferred_language?: string;
+    public role: string;
+    public producerRequest?: ProducerRequest;
 
     public constructor(
         email: string,
@@ -15,7 +17,9 @@ export class AuthRegisterRequest {
         full_name: string,
         phone_number?: string,
         country?: string,
-        preferred_language?: string
+        preferred_language?: string,
+        role?: string,
+        producerRequest?: ProducerRequest
     ) {
         this.email = email;
         this.password_hash = password_hash;
@@ -23,6 +27,8 @@ export class AuthRegisterRequest {
         this.phone_number = phone_number;
         this.country = country;
         this.preferred_language = preferred_language;
+        this.role = role;
+        this.producerRequest = producerRequest;
     }
 
     public static validateSchema(): ZodTypeAny {
@@ -46,7 +52,12 @@ export class AuthRegisterRequest {
             preferred_language: z.string()
                 .min(2, "El idioma preferido debe tener al menos 2 caracteres")
                 .max(30, "El idioma preferido no debe exceder los 30 caracteres")
-                .regex(/^[a-zA-Z\s]+$/, "El idioma preferido solo debe contener letras y espacios")
+                .regex(/^[a-zA-Z\s]+$/, "El idioma preferido solo debe contener letras y espacios"),
+            role: z.string()
+                .trim()
+                .toUpperCase()
+                .refine(val => ["USER", "PRODUCER"]
+                .includes(val), { message: "El rol debe ser 'user' o 'admin'" })
         })
     }
 

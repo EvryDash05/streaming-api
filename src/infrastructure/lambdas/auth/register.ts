@@ -1,19 +1,21 @@
-import 'dotenv/config';
 import middy from "@middy/core";
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { errorHandlingMiddleware, jsonBodyParser, zodValidator } from "../../middlewares/zodValidator";
+import 'dotenv/config';
 import { AuthBusiness } from "../../../application/business/AuthBusiness";
+import { UserRepository } from '../../../domain/repository/userRepository';
+import { buildHttpResponse, LambdaResponse } from '../../../utils/HttpUtils';
+import { errorHandlingMiddleware, jsonBodyParser, zodValidator } from "../../middlewares/zodValidator";
 import { AuthRegisterRequest } from "../../models/request/auth/AuthRegisterRequest";
+
+/* Dependencies */
+const userRepository = new UserRepository();
 
 export async function registerUserHandler(
     event: APIGatewayProxyEvent
-): Promise<any> {
-    const response = await new AuthBusiness().register(event.body as unknown as AuthRegisterRequest);
-    return {
-        statusCode: response.success ? 201 : 400,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ response }),
-    };
+): Promise<LambdaResponse> {
+    const response = await new AuthBusiness(userRepository).register(event.body as unknown as AuthRegisterRequest);
+    const statusCode = response.success ? 201 : 500;
+    return buildHttpResponse(statusCode, response);
 }
 
 export const handler = middy(registerUserHandler)

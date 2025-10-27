@@ -1,7 +1,7 @@
 import en from "zod/v4/locales/en.cjs";
 import prisma from "../../infrastructure/database/prismaClient";
 import { ProducerRequest } from "../../infrastructure/models/request/ProducerRequest";
-import { Repository } from "./Repository";
+import { Repository } from "./interfaces/Repository";
 
 
 export class ProducerRepository implements Repository<ProducerRequest, number> {

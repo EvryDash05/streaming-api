@@ -1,21 +1,37 @@
 import bycript from "bcryptjs";
 import { ProducerEntity } from "../../domain/entity/ProducersEntity";
 import { UserEntity } from "../../domain/entity/UsersEntity";
-import { Repository } from "../../domain/repository/Repository";
+import { Repository } from "../../domain/repository/interfaces/Repository";
 import { AuthLoginRequest } from '../../infrastructure/models/request/auth/AuthLoginRequest';
 import { AuthRegisterRequest } from "../../infrastructure/models/request/auth/AuthRegisterRequest";
 import { ProducerRequest } from "../../infrastructure/models/request/ProducerRequest";
 import { BaseResponse } from "../../infrastructure/models/response/common/baseResponse";
 import { AuthService } from "../service/auth/AuthService";
 import { errorResponse, successResponse } from "../../utils/HttpUtils";
+import { UserRepositoryInterface } from "../../domain/repository/interfaces/UserRepositoryInterface";
+import AuthorityRepositoryInterface from "../../domain/repository/interfaces/AuthorityRepositoryInterface";
+import { ca } from "zod/v4/locales/index.cjs";
+import { createJwtToken, createRefreshToken } from "../../infrastructure/security/JwtUtils";
+import logger from "../../utils/logger";
+import { AuthResponse } from "../../infrastructure/models/response/AuthResponse";
 
 export class AuthBusiness implements AuthService {
 
-    private readonly userRepository: Repository<UserEntity, number>;
+    private readonly userRepository: UserRepositoryInterface;
+    private readonly authorityRepository: AuthorityRepositoryInterface;
 
-    public constructor(userRepository: Repository<UserEntity, number>) {
+    public constructor(
+        userRepository: UserRepositoryInterface,
+        authorityRepository: AuthorityRepositoryInterface
+    ) {
         this.userRepository = userRepository;
+        this.authorityRepository = authorityRepository;
     }
+
+    /* constructor(
+        private readonly userRepository: UserRepositoryInterface,
+        private readonly authorityRepository: AuthorityRepositoryInterface
+    ) {} */
 
     async register(request: AuthRegisterRequest): Promise<BaseResponse<void>> {
         try {
@@ -35,8 +51,39 @@ export class AuthBusiness implements AuthService {
         }
     }
 
-    authenticate(request: AuthLoginRequest): Promise<BaseResponse<string[]>> {
-        throw new Error("Method not implemented.");
+    async authenticate(request: AuthLoginRequest): Promise<BaseResponse<AuthResponse>> {
+        try {
+            logger.info('In authentication method');
+            const user = await this.userRepository.findUserByEmailAndPassword(request.email, request.password);
+            
+            if (!user) {
+                return errorResponse("Credenciales inválidas", ["Email o contraseña incorrectos"], 401);
+            }
+    
+            const authorities = await this.authorityRepository.findAuthorityByRoleName(user.role);
+
+            const accessToken: string = await createJwtToken({
+                sub: user.id.toString(),
+                email: user.email,
+                roles: user.role,
+                authorities: authorities ? authorities.map(a => a.name) : []
+            })
+
+            const refreshToken: string = await createRefreshToken({
+                sub: user.id.toString(),
+                email: user.email,
+                type: 'refresh'
+            })
+
+            const data = {
+                accessToken, 
+                refreshToken
+            }
+            
+            return successResponse<AuthResponse>("Autenticación exitosa", data, 200);
+        } catch (error: any) {
+            return errorResponse("Error interno del servidor", error.message, 500);
+        }
     }
 
     refreshToken(token: string): Promise<BaseResponse<string[]>> {

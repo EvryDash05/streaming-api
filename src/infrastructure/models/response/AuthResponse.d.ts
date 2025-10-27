@@ -1,5 +1,5 @@
 
-export interface UserResponse {
-    message: string;
-    email: string;
+export interface AuthResponse {
+    accessToken: string;
+    refreshToken: string;
 }

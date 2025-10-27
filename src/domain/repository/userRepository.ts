@@ -1,8 +1,11 @@
+import bycript from "bcryptjs";
 import prisma from "../../infrastructure/database/prismaClient";
 import { UserEntity } from "../entity/UsersEntity";
-import { Repository } from "./Repository";
+import { UserRepositoryInterface } from "./interfaces/UserRepositoryInterface";
+import logger from "../../utils/logger";
+import { role_enum } from "@prisma/client";
 
-export class UserRepository implements Repository<UserEntity, number> {
+export class UserRepository implements UserRepositoryInterface {
 
     findById(id: number): Promise<UserEntity | null> {
         throw new Error("Method not implemented.");
@@ -21,7 +24,7 @@ export class UserRepository implements Repository<UserEntity, number> {
                 data: {
                     email,
                     password_hash,
-                    role: role === 'PRODUCER' ? 'producer' : 'user',
+                    role: role as role_enum,
                     user_roles: {
                         create: {
                             roles: { connect: { id: roleId } }
@@ -66,6 +69,22 @@ export class UserRepository implements Repository<UserEntity, number> {
 
     delete(id: number): Promise<void> {
         throw new Error("Method not implemented.");
+    }
+
+    async findUserByEmailAndPassword(email: string, password: string): Promise<{
+        email: string;
+        role: string;
+        password_hash: string;
+        created_at: Date | null;
+        updated_at: Date | null;
+        id: number;
+    } | null> {
+        logger.info(`Finding user by email: ${email}`);
+        const user = await prisma.users.findUnique({ where: { email } });
+        if (!user) return null
+
+        const isPasswordValid = await bycript.compare(password, user.password_hash);
+        return isPasswordValid ? user : null;
     }
 
 }

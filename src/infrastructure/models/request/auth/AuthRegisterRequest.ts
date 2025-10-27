@@ -1,15 +1,16 @@
 import { z, ZodTypeAny } from "zod";
 import { ProducerRequest } from "../ProducerRequest";
+import { Request } from "../Request";
 
-export class AuthRegisterRequest {
+export class AuthRegisterRequest extends Request {
     public email: string;
     public password_hash: string;
     public full_name: string;
-    public phone_number?: string;
-    public country?: string;
-    public preferred_language?: string;
-    public role: string;
-    public producerRequest?: ProducerRequest;
+    public phone_number: string | undefined;
+    public country: string | undefined;
+    public preferred_language: string | undefined;
+    public role: string | undefined;
+    public producerRequest: ProducerRequest | undefined;
 
     public constructor(
         email: string,
@@ -21,6 +22,7 @@ export class AuthRegisterRequest {
         role?: string,
         producerRequest?: ProducerRequest
     ) {
+        super();
         this.email = email;
         this.password_hash = password_hash;
         this.full_name = full_name;
@@ -57,7 +59,7 @@ export class AuthRegisterRequest {
                 .trim()
                 .toUpperCase()
                 .refine(val => ["USER", "PRODUCER"]
-                .includes(val), { message: "El rol debe ser 'user' o 'admin'" })
+                    .includes(val), { message: "El rol debe ser 'user' o 'admin'" })
         })
     }
 

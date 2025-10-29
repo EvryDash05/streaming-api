@@ -1,14 +1,14 @@
 import { UserEntity } from "../../entity/UsersEntity";
 import { Repository } from "./Repository";
 
+type UserRow = {
+    id: number;
+    email: string;
+    role: string;
+    passwordHash: string;
+};
+
 interface UserRepositoryInterface extends Repository<UserEntity, number> {
-    findUserByEmailAndPassword(email: string, password: string): Promise<{
-        email: string;
-        role: RoleEntity;
-        password_hash: string;
-        created_at: Date | null;
-        updated_at: Date | null;
-        id: number;
-    } | null>;
+    findUserByEmailAndPassword(email: string, password: string): Promise<UserRow | null>;
 }
 

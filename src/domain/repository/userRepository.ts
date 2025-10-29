@@ -1,9 +1,8 @@
 import bycript from "bcryptjs";
-import prisma from "../../infrastructure/database/prismaClient";
 import { UserEntity } from "../entity/UsersEntity";
-import { UserRepositoryInterface } from "./interfaces/UserRepositoryInterface";
+import { UserRepositoryInterface, UserRow } from "./interfaces/UserRepositoryInterface";
 import logger from "../../utils/logger";
-import { role_enum } from "@prisma/client";
+import databaseClient from "../../infrastructure/database/databaseClient";
 
 export class UserRepository implements UserRepositoryInterface {
 
@@ -19,49 +18,51 @@ export class UserRepository implements UserRepositoryInterface {
         const { email, passwordHash: password_hash, fullName, country, phoneNumber, preferredLanguage, role } = entity;
         const roleId = role === "PRODUCER" ? 2 : 1;
 
-        const userId = await prisma.$transaction(async (tx) => {
-            const user = await tx.users.create({
-                data: {
-                    email,
-                    password_hash,
-                    role: role as role_enum,
-                    user_roles: {
-                        create: {
-                            roles: { connect: { id: roleId } }
-                        }
-                    },
-                    user_details: {
-                        create: {
-                            full_name: fullName ?? null,
-                            country: country ?? null,
-                            phone_number: phoneNumber ?? null,
-                            preferred_language: preferredLanguage ?? null,
-                            created_by: "system"
-                        }
-                    }
-                },
-                select: { id: true }
-            });
+        const client = await (databaseClient as any).pool.connect();
+        try {
+            await client.query("BEGIN");
 
-            if (role === "PRODUCER" && role) {
-                const { institutionName, description, contactEmail, contactPhone } = entity.producer || {};
+            const userResult = await client.query(
+                `INSERT INTO users (email, password_hash, role)
+                VALUES ($1, $2, $3) RETURNING id`,
+                [email, password_hash, role]
+            );
+            const userId = userResult.rows[0].id;
 
-                await tx.producers.create({
-                    data: {
-                        user_id: user.id,
-                        institution_name: institutionName ?? null,
-                        description: description ?? null,
-                        contact_email: contactEmail ?? null,
-                        contact_phone: contactPhone ?? null
-                    }
-                });
+            await client.query(
+                `INSERT INTO user_roles (user_id, role_id)
+                VALUES ($1, $2)`,
+                [userId, roleId]
+            );
+
+            // 3️⃣ Insertar en user_details
+            await client.query(
+                `INSERT INTO user_details (user_id, full_name, country, phone_number, preferred_language, created_by)
+                VALUES ($1, $2, $3, $4, $5, 'system')`,
+                [userId, fullName ?? null, country ?? null, phoneNumber ?? null, preferredLanguage ?? null]
+            );
+
+            // 4️⃣ Insertar en producers si aplica
+            if (role === "PRODUCER" && entity.producer) {
+                const { institutionName, description, contactEmail, contactPhone } = entity.producer;
+
+                await client.query(
+                    `INSERT INTO producers (user_id, institution_name, description, contact_email, contact_phone)
+           VALUES ($1, $2, $3, $4, $5)`,
+                    [userId, institutionName ?? null, description ?? null, contactEmail ?? null, contactPhone ?? null]
+                );
             }
 
-            return user.id;
-        });
+            await client.query("COMMIT");
+            return userId;
 
-
-        return userId;
+        } catch (err) {
+            await client.query("ROLLBACK");
+            console.error("Error saving user:", err);
+            throw err;
+        } finally {
+            client.release();
+        }
     }
 
     async update(entity: UserEntity): Promise<void> {
@@ -71,20 +72,37 @@ export class UserRepository implements UserRepositoryInterface {
         throw new Error("Method not implemented.");
     }
 
-    async findUserByEmailAndPassword(email: string, password: string): Promise<{
-        email: string;
-        role: string;
-        password_hash: string;
-        created_at: Date | null;
-        updated_at: Date | null;
-        id: number;
-    } | null> {
+    async findUserByEmailAndPassword(email: string, password: string): Promise<UserRow | null> {
         logger.info(`Finding user by email: ${email}`);
-        const user = await prisma.users.findUnique({ where: { email } });
-        if (!user) return null
 
-        const isPasswordValid = await bycript.compare(password, user.password_hash);
-        return isPasswordValid ? user : null;
+        try {
+            const result = await databaseClient.query<UserRow>(
+                `SELECT id, email, password_hash AS "passwordHash", role
+                    FROM users
+                    WHERE email = $1`,
+                [email]
+            );
+
+            if (result.rows.length === 0) return null;
+
+            const row = result.rows[0];
+
+            logger.info(`User row retrieved: ${JSON.stringify(row)}`);
+            const isPasswordValid = await bycript.compare(password, row?.passwordHash!);
+            if (!isPasswordValid) return null;
+
+            const user: UserRow = {
+                id: row!.id ,
+                email: row!.email,
+                passwordHash: row!.passwordHash,
+                role: row!.role
+            };
+
+            return user;
+        } catch (err) {
+            console.error("Error al encontrar el usuario", err);
+            throw err;
+        }
     }
 
 }

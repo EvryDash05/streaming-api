@@ -1,7 +1,6 @@
-import * as jose from 'jose'
-import { config } from "../../utils/config";
+import * as jose from 'jose';
 
-interface JwtPayload {
+interface JwtPayload extends jose.JWTPayload {
     sub: string;
     email: string;
     roles: string;
@@ -16,21 +15,29 @@ const userGenerator = process.env.SECURITY_JWT_USER_GENERATOR!;
 const alg = 'HS256';
 
 export async function createJwtToken(payload: JwtPayload): Promise<string> {
-    return await new jose.SignJWT({ payload })
+    return await new jose.SignJWT({
+        roles: payload.roles,
+        email: payload.email,
+        authorities: payload.authorities,
+    })
+        .setSubject(payload.sub)
         .setProtectedHeader({ alg })
         .setIssuedAt()
         .setExpirationTime(expirationTime)
-        .setJti(self.crypto.randomUUID())
+        .setJti(crypto.randomUUID())
         .setIssuer(userGenerator)
         .sign(secret)
 }
 
 export async function createRefreshToken(payload: {
-    sub: string;
-    email: string;
-    type: string;
+    email: string,
+    type: 'refresh'
 }): Promise<string> {
-    return await new jose.SignJWT({ payload })
+    return await new jose.SignJWT({
+        email: payload.email,
+        type: 'refresh'
+    })
+        .setSubject(payload.sub)
         .setProtectedHeader({ alg })
         .setIssuedAt()
         .setExpirationTime(refreshExpirationTime)

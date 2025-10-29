@@ -1,19 +1,17 @@
 import bycript from "bcryptjs";
 import { ProducerEntity } from "../../domain/entity/ProducersEntity";
 import { UserEntity } from "../../domain/entity/UsersEntity";
-import { Repository } from "../../domain/repository/interfaces/Repository";
+import AuthorityRepositoryInterface from "../../domain/repository/interfaces/AuthorityRepositoryInterface";
+import { UserRepositoryInterface } from "../../domain/repository/interfaces/UserRepositoryInterface";
 import { AuthLoginRequest } from '../../infrastructure/models/request/auth/AuthLoginRequest';
 import { AuthRegisterRequest } from "../../infrastructure/models/request/auth/AuthRegisterRequest";
 import { ProducerRequest } from "../../infrastructure/models/request/ProducerRequest";
-import { BaseResponse } from "../../infrastructure/models/response/common/baseResponse";
-import { AuthService } from "../service/auth/AuthService";
-import { errorResponse, successResponse } from "../../utils/HttpUtils";
-import { UserRepositoryInterface } from "../../domain/repository/interfaces/UserRepositoryInterface";
-import AuthorityRepositoryInterface from "../../domain/repository/interfaces/AuthorityRepositoryInterface";
-import { ca } from "zod/v4/locales/index.cjs";
-import { createJwtToken, createRefreshToken } from "../../infrastructure/security/JwtUtils";
-import logger from "../../utils/logger";
 import { AuthResponse } from "../../infrastructure/models/response/AuthResponse";
+import { BaseResponse } from "../../infrastructure/models/response/common/baseResponse";
+import { createJwtToken, createRefreshToken } from "../../infrastructure/security/JwtUtils";
+import { errorResponse, successResponse } from "../../utils/HttpUtils";
+import logger from "../../utils/logger";
+import { AuthService } from "../service/auth/AuthService";
 
 export class AuthBusiness implements AuthService {
 
@@ -62,15 +60,16 @@ export class AuthBusiness implements AuthService {
     
             const authorities = await this.authorityRepository.findAuthorityByRoleName(user.role);
 
+            logger.info('Generating tokens...');
+
             const accessToken: string = await createJwtToken({
                 sub: user.id.toString(),
                 email: user.email,
                 roles: user.role,
-                authorities: authorities ? authorities.map(a => a.name) : []
+                authorities: authorities || [],
             })
 
             const refreshToken: string = await createRefreshToken({
-                sub: user.id.toString(),
                 email: user.email,
                 type: 'refresh'
             })
@@ -80,6 +79,7 @@ export class AuthBusiness implements AuthService {
                 refreshToken
             }
             
+            logger.info('Authentication successful, returning tokens');
             return successResponse<AuthResponse>("Autenticación exitosa", data, 200);
         } catch (error: any) {
             return errorResponse("Error interno del servidor", error.message, 500);

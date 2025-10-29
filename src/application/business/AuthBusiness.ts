@@ -70,6 +70,7 @@ export class AuthBusiness implements AuthService {
             })
 
             const refreshToken: string = await createRefreshToken({
+                sub: user.id.toString(),
                 email: user.email,
                 type: 'refresh'
             })

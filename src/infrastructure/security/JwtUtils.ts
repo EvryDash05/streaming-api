@@ -30,6 +30,7 @@ export async function createJwtToken(payload: JwtPayload): Promise<string> {
 }
 
 export async function createRefreshToken(payload: {
+    sub: string,
     email: string,
     type: 'refresh'
 }): Promise<string> {

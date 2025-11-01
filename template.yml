@@ -33,3 +33,17 @@ Resources:
         SECURITY_JWT_HASHED_SECRET: some_hashed_secret
         BCRYPT_SALT_ROUNDS: some_number
         DATABASE_URL: some_db_url
+  
+  userDetailsStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./src/infrastructure/lambdas/userDetails/template.yml
+      Parameters:
+        NODE_ENV: development
+        SECURITY_JWT_KEY: some_jwt_key
+        SECURITY_JWT_ACCESS_EXPIRATION: some_access_expiration
+        SECURITY_JWT_REFRESH_EXPIRATION: some_refresh_expiration
+        SECURITY_JWT_USER_GENERATOR: some_user_generator
+        SECURITY_JWT_HASHED_SECRET: some_hashed_secret
+        BCRYPT_SALT_ROUNDS: some_number
+        DATABASE_URL: some_db_url

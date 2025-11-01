@@ -1,11 +1,11 @@
 export interface UserDetailsEntity {
   id: number;
-  user_id: number;
-  full_name?: string | null;
-  phone_number?: string | null;
+  userId: number;
+  fullName?: string | null;
+  phoneNumber?: string | null;
   country?: string | null;
-  preferred_language?: string | null;
-  created_by: string;
+  preferredLanguage?: string | null;
+  created_by?: string | null;
   created_at?: string | null;
   last_update_by?: string | null;
   last_update_at?: string | null;

@@ -6,7 +6,7 @@ import databaseClient from "../../infrastructure/database/databaseClient";
 
 export class UserRepository implements UserRepositoryInterface {
 
-    findById(id: number): Promise<UserEntity | null> {
+    async findById(id: number): Promise<UserEntity | null> {
         throw new Error("Method not implemented.");
     }
 

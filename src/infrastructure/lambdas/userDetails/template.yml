@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  NODE_ENV:
+    Type: String
+  SECURITY_JWT_KEY:
+    Type: String
+  SECURITY_JWT_ACCESS_EXPIRATION:
+    Type: String
+  SECURITY_JWT_REFRESH_EXPIRATION:
+    Type: String
+  SECURITY_JWT_USER_GENERATOR:
+    Type: String
+  SECURITY_JWT_HASHED_SECRET:
+    Type: String
+  BCRYPT_SALT_ROUNDS:
+    Type: String
+  DATABASE_URL:
+    Type: String
+
+Globals:
+  Function:
+    Timeout: 30
+    Environment:
+      Variables:
+        NODE_ENV: !Ref NODE_ENV
+        SECURITY_JWT_KEY: !Ref SECURITY_JWT_KEY
+        SECURITY_JWT_ACCESS_EXPIRATION: !Ref SECURITY_JWT_ACCESS_EXPIRATION
+        SECURITY_JWT_REFRESH_EXPIRATION: !Ref SECURITY_JWT_REFRESH_EXPIRATION
+        SECURITY_JWT_USER_GENERATOR: !Ref SECURITY_JWT_USER_GENERATOR
+        SECURITY_JWT_HASHED_SECRET: !Ref SECURITY_JWT_HASHED_SECRET
+        BCRYPT_SALT_ROUNDS: !Ref BCRYPT_SALT_ROUNDS
+        DATABASE_URL: !Ref DATABASE_URL
+
+Resources:
+  FindUserDetailsByUserIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/infrastructure/lambdas/userDetails/findById/findUserDetailByUserId.handler
+      CodeUri: ../../../../dist
+      Runtime: nodejs20.x
+      Events:
+        Login:
+          Type: Api
+          Properties:
+            Path: /userDetails/findById/{userId}
+            Method: GET
+

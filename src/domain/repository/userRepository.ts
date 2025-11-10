@@ -2,7 +2,7 @@ import bycript from "bcryptjs";
 import { UserEntity } from "../entity/UsersEntity";
 import { UserRepositoryInterface, UserRow } from "./interfaces/UserRepositoryInterface";
 import logger from "../../utils/logger";
-import databaseClient from "../../infrastructure/database/databaseClient";
+import databaseClient from "../../infrastructure/config/database/databaseClient";
 
 export class UserRepository implements UserRepositoryInterface {
 

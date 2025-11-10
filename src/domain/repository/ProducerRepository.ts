@@ -1,4 +1,4 @@
-import databaseClient from "../../infrastructure/database/databaseClient";
+import databaseClient from "../../infrastructure/config/database/databaseClient";
 import { ProducerRequest } from "../../infrastructure/models/request/ProducerRequest";
 import { Repository } from "./interfaces/Repository";
 

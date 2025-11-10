@@ -1,5 +1,5 @@
 export interface VideoEntity {
-  id: number;
+  id?: number | null;
   producer_id: number;
   title: string;
   description?: string | null;

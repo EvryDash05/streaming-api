@@ -4,9 +4,10 @@ import 'dotenv/config';
 import { AuthBusiness } from "../../../../application/business/AuthBusiness";
 import { UserRepository } from '../../../../domain/repository/userRepository';
 import { buildLambdaResponse, LambdaResponse } from '../../../../utils/HttpUtils';
-import { errorHandlingMiddleware, jsonBodyParser, zodValidator } from "../../../middlewares/zodValidator";
 import { AuthRegisterRequest } from "../../../models/request/auth/AuthRegisterRequest";
 import { AuthorityRepository } from "../../../../domain/repository/AuthorityRepository";
+import { jsonBodyParser } from "../../../middlewares/parsingMiddleware";
+import { zodValidator } from "../../../middlewares/validationMiddleware";
 
 /* Dependencies */
 const userRepository = new UserRepository();
@@ -22,5 +23,4 @@ export async function registerUserHandler(
 
 export const handler = middy(registerUserHandler)
     .use(jsonBodyParser())
-    .use(zodValidator(AuthRegisterRequest.validateSchema()))
-    .use(errorHandlingMiddleware())
+    .use(zodValidator(AuthRegisterRequest.validateSchema()));

@@ -1,11 +1,12 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { buildLambdaResponse, LambdaResponse } from "../../../../utils/HttpUtils";
 import middy from "@middy/core";
-import { errorHandlingMiddleware, jsonBodyParser, zodValidator } from "../../../middlewares/zodValidator";
 import { AuthLoginRequest } from "../../../models/request/auth/AuthLoginRequest";
 import { AuthBusiness } from "../../../../application/business/AuthBusiness";
 import { UserRepository } from "../../../../domain/repository/userRepository";
 import { AuthorityRepository } from "../../../../domain/repository/AuthorityRepository";
+import { jsonBodyParser } from "../../../middlewares/parsingMiddleware";
+import { zodValidator } from "../../../middlewares/validationMiddleware";
 
 /* Dependencies */
 const userRepository = new UserRepository();
@@ -22,4 +23,3 @@ export async function loginHandler(
 export const handler = middy(loginHandler)
     .use(jsonBodyParser())
     .use(zodValidator(AuthLoginRequest.validateSchema()))
-    .use(errorHandlingMiddleware())

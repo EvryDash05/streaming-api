@@ -1,4 +1,4 @@
-import databaseClient from "../../infrastructure/database/databaseClient";
+import databaseClient from "../../infrastructure/config/database/databaseClient";
 import { UserDetailsEntity } from "../entity/UserDetailsEntity";
 import UserDetailsRepositoryInterface from "./interfaces/UserDetailsRepositoryInterface";
 

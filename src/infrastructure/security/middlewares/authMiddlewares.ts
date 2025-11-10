@@ -4,6 +4,7 @@ import { JWTPayload } from "jose";
 import { buildLambdaResponse, errorResponse, LambdaResponse } from "../../../utils/HttpUtils";
 import logger from "../../../utils/logger";
 import { verifyJwtToken } from "../JwtUtils";
+import loggerMessage from "../../../utils/logger";
 
 class AuthMiddlewares {
 
@@ -30,7 +31,9 @@ class AuthMiddlewares {
                 }
 
                 logger.info(`Token: ${jwtToken}`);
+
                 const payload = await verifyJwtToken(jwtToken);
+                request.auth = payload;
 
                 if (!payload) {
                     logger.error('Invalid or expired token');
@@ -38,7 +41,11 @@ class AuthMiddlewares {
                     return buildLambdaResponse(error.statusCode, error);
                 }
 
-                request.auth = payload;
+                request.event.requestContext = request.event.requestContext || {};
+                request.event.requestContext.authorizer = {
+                    ...(request.event.requestContext.authorizer || {}),
+                    jwt: payload
+                };
 
                 return;
             }
@@ -50,11 +57,32 @@ class AuthMiddlewares {
             before: async (request: any): Promise<LambdaResponse | void> => {
                 const payload: JWTPayload = request.auth;
                 
+                loggerMessage.info('Body: ' + payload);
                 logger.info('Allowed roles: ' + allowedRoles);
 
                 if (!payload.roles || !allowedRoles.includes(payload.roles as string)) {
                     logger.error('Access denied...')
                     const error = errorResponse('Acceso denegado', ['No tienes permisos para acceder a este recurso'], 403);
+                    return buildLambdaResponse(error.statusCode, error);
+                }
+
+                return;
+            }
+        }
+    }
+
+    public static cheackPermissions(allowedPermissions: string[]): MiddlewareObj<APIGatewayEvent, APIGatewayProxyResult> {
+        return {
+            before: async (request: any): Promise<LambdaResponse | void> => {
+                const payload: JWTPayload = request.auth;
+                loggerMessage.info('Body: ' + request);
+                logger.info('Allowed permissions: ' + allowedPermissions);
+
+                const userPermissions: string[] = payload.authorities as string[] || [];
+
+                if (!userPermissions || !allowedPermissions.every(permission => userPermissions.includes(permission))) {
+                    logger.error('Access denied due to insufficient permissions')
+                    const error = errorResponse('Acceso denegado', ['No tienes permisos suficientes para acceder a este recurso'], 403);
                     return buildLambdaResponse(error.statusCode, error);
                 }
 

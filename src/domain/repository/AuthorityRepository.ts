@@ -1,4 +1,4 @@
-import databaseClient from "../../infrastructure/database/databaseClient";
+import databaseClient from "../../infrastructure/config/database/databaseClient";
 import { AuthorityEntity } from "../entity/AuthoritiesEntity";
 import AuthorityRepositoryInterface from "./interfaces/AuthorityRepositoryInterface";
 

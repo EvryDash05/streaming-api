@@ -26,7 +26,9 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.922.0",
     "@aws-sdk/client-secrets-manager": "^3.901.0",
+    "@aws-sdk/s3-request-presigner": "^3.922.0",
     "@middy/core": "^6.4.4",
     "@middy/http-error-handler": "^6.4.4",
     "@middy/http-json-body-parser": "^6.4.4",

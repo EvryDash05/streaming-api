@@ -1,16 +1,19 @@
 import bycript from "bcryptjs";
+import { USER_ERRORS } from "../../constants/errors/errorsConstants";
 import { ProducerEntity } from "../../domain/entity/ProducersEntity";
 import { UserEntity } from "../../domain/entity/UsersEntity";
 import AuthorityRepositoryInterface from "../../domain/repository/interfaces/AuthorityRepositoryInterface";
 import { UserRepositoryInterface } from "../../domain/repository/interfaces/UserRepositoryInterface";
+import { AuthError } from "../../infrastructure/exceptions/Exceptions";
 import { AuthLoginRequest } from '../../infrastructure/models/request/auth/AuthLoginRequest';
 import { AuthRegisterRequest } from "../../infrastructure/models/request/auth/AuthRegisterRequest";
 import { ProducerRequest } from "../../infrastructure/models/request/ProducerRequest";
 import { AuthResponse } from "../../infrastructure/models/response/AuthResponse";
 import { BaseResponse } from "../../infrastructure/models/response/common/baseResponse";
 import { createJwtToken, createRefreshToken } from "../../infrastructure/security/JwtUtils";
-import { errorResponse, successResponse } from "../../utils/HttpUtils";
-import logger from "../../utils/logger";
+import { handleBusinessOperation } from "../../utils/errorHandler";
+import { successResponse } from "../../utils/HttpUtils";
+import loggerMessage from "../../utils/logger";
 import { AuthService } from "../service/auth/AuthService";
 
 export class AuthBusiness implements AuthService {
@@ -26,65 +29,51 @@ export class AuthBusiness implements AuthService {
         this.authorityRepository = authorityRepository;
     }
 
-    /* constructor(
-        private readonly userRepository: UserRepositoryInterface,
-        private readonly authorityRepository: AuthorityRepositoryInterface
-    ) {} */
-
     async register(request: AuthRegisterRequest): Promise<BaseResponse<void>> {
-        try {
-            console.log('In register User')
-            request.password_hash = await bycript.hash(request.password_hash, 10);
-            const userEntity = this.mapToEntity(request, request.password_hash);
-            await this.userRepository.save(userEntity);
+        console.log('In register User')
+        
+        request.password_hash = await bycript.hash(request.password_hash, 10);
+        const userEntity = this.mapToEntity(request, request.password_hash);
+        await handleBusinessOperation(
+            async () => await this.userRepository.save(userEntity),
+            USER_ERRORS.SAVE
+        );
 
-            return successResponse<void>("Usuario registrado con éxito", null, 201);
-        } catch (error: any) {
-            if (error.code === 'P2002') {
-                const field = error.meta.target[0];
-                return errorResponse(`${field} ya registrado`, [`${field} duplicado`], 409);
-            }
-
-            return errorResponse("Error interno del servidor", error.message, 500);
-        }
+        return successResponse<void>("Usuario registrado con éxito", null, 201);
     }
 
     async authenticate(request: AuthLoginRequest): Promise<BaseResponse<AuthResponse>> {
-        try {
-            logger.info('In authentication method');
-            const user = await this.userRepository.findUserByEmailAndPassword(request.email, request.password);
-            
-            if (!user) {
-                return errorResponse("Credenciales inválidas", ["Email o contraseña incorrectos"], 401);
-            }
-    
-            const authorities = await this.authorityRepository.findAuthorityByRoleName(user.role);
+        loggerMessage.info('In authentication method');
+        const user = await this.userRepository.findUserByEmailAndPassword(request.email, request.password);
 
-            logger.info('Generating tokens...');
-
-            const accessToken: string = await createJwtToken({
-                sub: user.id.toString(),
-                email: user.email,
-                roles: user.role,
-                authorities: authorities || [],
-            })
-
-            const refreshToken: string = await createRefreshToken({
-                sub: user.id.toString(),
-                email: user.email,
-                type: 'refresh'
-            })
-
-            const data = {
-                accessToken, 
-                refreshToken
-            }
-            
-            logger.info('Authentication successful, returning tokens');
-            return successResponse<AuthResponse>("Autenticación exitosa", data, 200);
-        } catch (error: any) {
-            return errorResponse("Error interno del servidor", error.message, 500);
+        if (!user) {
+            throw new AuthError('Credenciales inválidas', { detail: 'El email o la contraseña son incorrectos' });
         }
+
+        const authorities = await this.authorityRepository.findAuthorityByRoleName(user.role);
+
+        loggerMessage.info('Generating tokens...');
+
+        const accessToken: string = await createJwtToken({
+            sub: user.id.toString(),
+            email: user.email,
+            roles: user.role,
+            authorities: authorities || [],
+        })
+
+        const refreshToken: string = await createRefreshToken({
+            sub: user.id.toString(),
+            email: user.email,
+            type: 'refresh'
+        })
+
+        const data = {
+            accessToken,
+            refreshToken
+        }
+
+        loggerMessage.info('Authentication successful, returning tokens');
+        return successResponse<AuthResponse>("Autenticación exitosa", data, 200);
     }
 
     refreshToken(token: string): Promise<BaseResponse<string[]>> {

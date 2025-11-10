@@ -1,6 +1,8 @@
 import databaseClient from "../../infrastructure/config/database/databaseClient";
+import DatabaseErrorHelper from "../../utils/databaseError.helper";
 import { UserDetailsEntity } from "../entity/UserDetailsEntity";
 import UserDetailsRepositoryInterface from "./interfaces/UserDetailsRepositoryInterface";
+import { FIND_USER_DETAILS_BY_USER_ID_QUERY } from "./queries/userDetailsRepository.queries";
 
 export class UserDetailsRespository implements UserDetailsRepositoryInterface {
 
@@ -25,18 +27,10 @@ export class UserDetailsRespository implements UserDetailsRepositoryInterface {
     }
 
     async findUserDetailsByUserId(userId: number): Promise<UserDetailsEntity | null> {
-        const client = await(databaseClient as any).pool.connect();
+        const client = await (databaseClient as any).pool.connect();
         try {
             const userResult = await client.query(
-                `SELECT
-                    id,
-                    user_id AS "userId",
-                    full_name AS "fullName",
-                    phone_number AS "phoneNumber",
-                    country,
-                    preferred_language AS "preferredLanguage"
-                FROM user_details
-                WHERE user_id = $1;`,
+                FIND_USER_DETAILS_BY_USER_ID_QUERY,
                 [userId]
             )
 
@@ -52,8 +46,8 @@ export class UserDetailsRespository implements UserDetailsRepositoryInterface {
                 country: row.country,
                 preferredLanguage: row.preferredLanguage
             }
-        } catch (err: any) {
-            throw new Error(`Error al encontrar el usuario con id: ${userId}`);
+        } catch (error: any) {
+            throw DatabaseErrorHelper.translate(error);
         } finally {
             client.release();
         }

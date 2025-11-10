@@ -1,7 +1,7 @@
 import { MiddlewareObj } from "@middy/core";
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ZodTypeAny } from "zod";
-import { HttpError } from "../exceptions/BadRequestException.js";
+import { BusinessError } from "../exceptions/Exceptions.js";
 
 export function zodValidator(schema: ZodTypeAny): MiddlewareObj<
     APIGatewayEvent,
@@ -17,8 +17,7 @@ export function zodValidator(schema: ZodTypeAny): MiddlewareObj<
                     field: err.path.length === 1 ? err.path[0] : err,
                     error_message: err.message
                 }))
-
-                throw new HttpError(400, 'Bad request', badFields);
+                throw new BusinessError('Bad request', badFields);
             }
 
         }

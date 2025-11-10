@@ -1,8 +1,9 @@
 import databaseClient from "../../infrastructure/config/database/databaseClient";
-import { FIND_ALL_VIDEOS_QUERY, SAVE_VIDEO_QUERY } from "../../infrastructure/config/database/queries/videoQueries";
-import logger from "../../utils/logger";
+import DatabaseErrorHelper from "../../utils/databaseError.helper";
+import loggerMessage from "../../utils/logger";
 import { VideoEntity } from "../entity/VideosEntity";
 import { VideoRepositoryInterface } from "./interfaces/VideoRepositoryInterface";
+import { FIND_ALL_VIDEOS_QUERY, SAVE_VIDEO_QUERY } from "./queries/videoQueries";
 
 class VideoRepository implements VideoRepositoryInterface {
 
@@ -16,13 +17,13 @@ class VideoRepository implements VideoRepositoryInterface {
                 FIND_ALL_VIDEOS_QUERY,
             );
 
-            logger.debug('Videos retrieved: ' + JSON.stringify(result.rows));
+            loggerMessage.debug('Videos retrieved: ' + JSON.stringify(result.rows));
             const savedVideo = result.rows;
 
             return savedVideo;
         } catch (error: Error | any) {
-            logger.error('Error to get all videos: ' + error.message);
-            throw new Error("Errro al obtener los videos");
+            loggerMessage.error('Error to get all videos: ' + error.message);
+            throw DatabaseErrorHelper.translate(error);
         }
     }
 
@@ -46,8 +47,8 @@ class VideoRepository implements VideoRepositoryInterface {
 
             return savedVideo?.id!;
         } catch (error: Error | any) {
-            logger.error('Error saving video: ' + error.message);
-            throw new Error("Error al guardar el video");
+            loggerMessage.error('Error saving video: ' + error.message);
+            throw DatabaseErrorHelper.translate(error);
         }
     }
 

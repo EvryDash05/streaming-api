@@ -1,7 +1,6 @@
 import { MiddlewareObj } from "@middy/core";
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import { HttpError } from "../exceptions/BadRequestException.js";
-import logger from "../../utils/logger.js";
+import { BusinessError } from "../exceptions/Exceptions.js";
 
 export function jsonBodyParser(): MiddlewareObj<
     APIGatewayEvent,
@@ -9,16 +8,11 @@ export function jsonBodyParser(): MiddlewareObj<
 > {
     return {
         before: async (request: any) => {
-            const { body } = request.event;
-            logger.info("Body: ", body);
             try {
                 request.event.body = JSON.parse(request.event.body);
             } catch {
-                throw new HttpError(400, "Cuerpo inválido, no es JSON válido", {
-                    receivedBody: body,
-                    expectedFormat: "JSON"
-                });
+                throw new BusinessError("InvalidBody", { detail: "El cuerpo de la solicitud no es un JSON válido" });
             }
         },
     };
-};
+};  

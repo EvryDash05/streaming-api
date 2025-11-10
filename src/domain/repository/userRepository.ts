@@ -1,8 +1,10 @@
 import bycript from "bcryptjs";
+import databaseClient from "../../infrastructure/config/database/databaseClient";
+import DatabaseErrorHelper from "../../utils/databaseError.helper";
+import logger from "../../utils/logger";
 import { UserEntity } from "../entity/UsersEntity";
 import { UserRepositoryInterface, UserRow } from "./interfaces/UserRepositoryInterface";
-import logger from "../../utils/logger";
-import databaseClient from "../../infrastructure/config/database/databaseClient";
+import { FIND_USER_BY_EMAIL_QUERY, INSERT_PRODUCER_QUERY, INSERT_USER_DETAILS_QUERY, INSERT_USER_QUERY, INSERT_USER_ROLE_QUERY } from "./queries/userRepository.queries";
 
 export class UserRepository implements UserRepositoryInterface {
 
@@ -22,44 +24,34 @@ export class UserRepository implements UserRepositoryInterface {
         try {
             await client.query("BEGIN");
 
-            const userResult = await client.query(
-                `INSERT INTO users (email, password_hash, role)
-                VALUES ($1, $2, $3) RETURNING id`,
+            const userResult = await client.query(INSERT_USER_QUERY,
                 [email, password_hash, role]
             );
             const userId = userResult.rows[0].id;
 
-            await client.query(
-                `INSERT INTO user_roles (user_id, role_id)
-                VALUES ($1, $2)`,
+            await client.query(INSERT_USER_ROLE_QUERY,
                 [userId, roleId]
             );
 
-            // 3️⃣ Insertar en user_details
-            await client.query(
-                `INSERT INTO user_details (user_id, full_name, country, phone_number, preferred_language, created_by)
-                VALUES ($1, $2, $3, $4, $5, 'system')`,
+            await client.query(INSERT_USER_DETAILS_QUERY,
                 [userId, fullName ?? null, country ?? null, phoneNumber ?? null, preferredLanguage ?? null]
             );
 
-            // 4️⃣ Insertar en producers si aplica
             if (role === "PRODUCER" && entity.producer) {
                 const { institutionName, description, contactEmail, contactPhone } = entity.producer;
 
                 await client.query(
-                    `INSERT INTO producers (user_id, institution_name, description, contact_email, contact_phone)
-           VALUES ($1, $2, $3, $4, $5)`,
+                    INSERT_PRODUCER_QUERY,
                     [userId, institutionName ?? null, description ?? null, contactEmail ?? null, contactPhone ?? null]
                 );
             }
 
+            
             await client.query("COMMIT");
             return userId;
-
         } catch (err) {
             await client.query("ROLLBACK");
-            console.error("Error saving user:", err);
-            throw err;
+            throw DatabaseErrorHelper.translate(err);
         } finally {
             client.release();
         }
@@ -77,9 +69,7 @@ export class UserRepository implements UserRepositoryInterface {
 
         try {
             const result = await databaseClient.query<UserRow>(
-                `SELECT id, email, password_hash AS "passwordHash", role
-                    FROM users
-                    WHERE email = $1`,
+                FIND_USER_BY_EMAIL_QUERY,
                 [email]
             );
 
@@ -92,7 +82,7 @@ export class UserRepository implements UserRepositoryInterface {
             if (!isPasswordValid) return null;
 
             const user: UserRow = {
-                id: row!.id ,
+                id: row!.id,
                 email: row!.email,
                 passwordHash: row!.passwordHash,
                 role: row!.role
@@ -100,8 +90,7 @@ export class UserRepository implements UserRepositoryInterface {
 
             return user;
         } catch (err) {
-            console.error("Error al encontrar el usuario", err);
-            throw err;
+            throw DatabaseErrorHelper.translate(err);
         }
     }
 

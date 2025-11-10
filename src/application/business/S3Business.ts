@@ -1,8 +1,9 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Singleton from "../../infrastructure/config/aws/S3/S3Client";
+import { BusinessError } from "../../infrastructure/exceptions/Exceptions";
 import { BaseResponse } from "../../infrastructure/models/response/common/baseResponse";
-import { errorResponse, successResponse } from "../../utils/HttpUtils";
+import { successResponse } from "../../utils/HttpUtils";
 import loggerMessage from "../../utils/logger";
 import S3Service from "../service/S3Service";
 
@@ -24,7 +25,7 @@ class S3Business implements S3Service {
             return successResponse("Token prefirmado generado correctamente", { presignedUrl: token, path: key }, 200);
         } catch (error: any) {
             loggerMessage.error(`Error generating presigned URL for key: ${key} - ${error.message}`);
-            return errorResponse("Error al generar el token prefirmado", error.message, 500);
+            throw new BusinessError("Error al generar el token prefirmado", error.message, 500);
         }
     }
 

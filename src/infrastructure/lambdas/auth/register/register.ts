@@ -8,6 +8,7 @@ import { AuthRegisterRequest } from "../../../models/request/auth/AuthRegisterRe
 import { AuthorityRepository } from "../../../../domain/repository/AuthorityRepository";
 import { jsonBodyParser } from "../../../middlewares/parsingMiddleware";
 import { zodValidator } from "../../../middlewares/validationMiddleware";
+import { errorHandlerMiddleware } from "../../../middlewares/errorHandlerMiddleware";
 
 /* Dependencies */
 const userRepository = new UserRepository();
@@ -17,10 +18,10 @@ export async function registerUserHandler(
     event: APIGatewayProxyEvent
 ): Promise<LambdaResponse> {
     const response = await new AuthBusiness(userRepository, authorityRepository).register(event.body as unknown as AuthRegisterRequest);
-    const statusCode = response.success ? 201 : 500;
-    return buildLambdaResponse(statusCode, response);
+    return buildLambdaResponse(response.statusCode, response);
 }
 
 export const handler = middy(registerUserHandler)
     .use(jsonBodyParser())
-    .use(zodValidator(AuthRegisterRequest.validateSchema()));
+    .use(zodValidator(AuthRegisterRequest.validateSchema()))
+    .use(errorHandlerMiddleware());

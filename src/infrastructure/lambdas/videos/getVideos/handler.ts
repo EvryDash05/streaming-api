@@ -3,6 +3,7 @@ import VideosBusiness from "../../../../application/business/VideosBusiness";
 import VideoRepository from "../../../../domain/repository/VideoRepository";
 import { buildLambdaResponse, LambdaResponse } from "../../../../utils/HttpUtils";
 import AuthMiddlewares from "../../../security/middlewares/authMiddlewares";
+import { errorHandlerMiddleware } from "../../../middlewares/errorHandlerMiddleware";
 
 const videoRepository: VideoRepository = new VideoRepository();
 
@@ -14,4 +15,5 @@ export async function saveVideoHandler(): Promise<LambdaResponse> {
 export const handler = middy(saveVideoHandler)
     .use(AuthMiddlewares.verifyJwt())
     .use(AuthMiddlewares.cheackRoles(['USER', 'PRODUCER']))
-    .use(AuthMiddlewares.cheackPermissions(['VIEW_CONTENT']));
+    .use(AuthMiddlewares.cheackPermissions(['VIEW_CONTENT']))
+    .use(errorHandlerMiddleware())

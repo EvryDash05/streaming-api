@@ -1,9 +1,11 @@
+import { VIDEO_ERRORS } from "../../constants/errors/errorsConstants";
 import { VideoEntity } from "../../domain/entity/VideosEntity";
 import { VideoRepositoryInterface } from "../../domain/repository/interfaces/VideoRepositoryInterface";
 import VideoRequest from "../../infrastructure/models/request/VideoRequest";
 import { BaseResponse } from "../../infrastructure/models/response/common/baseResponse";
 import { VideoResponse } from "../../infrastructure/models/response/VideoRespose";
-import { errorResponse, successResponse } from "../../utils/HttpUtils";
+import { handleBusinessOperation } from "../../utils/errorHandler";
+import { successResponse } from "../../utils/HttpUtils";
 import loggerMessage from "../../utils/logger";
 import { VideosService } from "../service/VideosService";
 
@@ -18,20 +20,16 @@ class VideosBusiness implements VideosService {
     }
 
     async saveVideo(request: VideoRequest, producerId: number): Promise<BaseResponse<number>> {
-        try {
-            loggerMessage.info('Saving video for producer ID: ' + request);
+        loggerMessage.info('Saving video for producer ID: ' + request);
 
-            const entity = this.mapToEntity(request, producerId);
-            const videoId = await this.videoRepository.save(entity);
+        const entity = this.mapToEntity(request, producerId);
+        const videoId = await handleBusinessOperation(
+            async () => await this.videoRepository.save(entity),
+            VIDEO_ERRORS.SAVE
+        )
 
-            loggerMessage.info('Video saved with ID: ' + videoId);
-            return successResponse<number>('Video guardado con éxito', videoId, 201);
-        } catch (error: Error | any) {
-            loggerMessage.error('Error saving video: ' + error.message);
-            return errorResponse('Error al guardar el video', {
-                message: error.message
-            }, 500);
-        }
+        loggerMessage.info('Video saved with ID: ' + videoId);
+        return successResponse<number>('Video guardado con éxito', videoId, 201);
     }
 
     findVideoById(id: number): Promise<BaseResponse<string>> {
@@ -43,18 +41,18 @@ class VideosBusiness implements VideosService {
     }
 
     async findAllVideos(): Promise<BaseResponse<VideoResponse[]>> {
-        try {
-            loggerMessage.info('Finding all videos');
+        const videos = await handleBusinessOperation(
+            async () => await this.videoRepository.findAll(),
+            VIDEO_ERRORS.FIND_ALL
+        )
 
-            const videos = await this.videoRepository.findAll();
-
-            const videosResponses = videos.map(video => this.mapToResponse(video));
-            return successResponse<VideoResponse[]>('Videos retrieved successfully', videosResponses, 200);
-        } catch (error) {
-            return errorResponse('Error retrieving videos', {
-                message: (error as Error).message
-            }, 500);
+        if (videos.length === 0) {
+            loggerMessage.info('No videos found');
+            return successResponse<VideoResponse[]>('No se encontraron videos', [], 200);
         }
+
+        const videosResponses = videos.map(video => this.mapToResponse(video));
+        return successResponse<VideoResponse[]>('Videos obtenidos correctamente', videosResponses, 200);
     }
 
     private mapToEntity(request: VideoRequest, producerId: number): VideoEntity {

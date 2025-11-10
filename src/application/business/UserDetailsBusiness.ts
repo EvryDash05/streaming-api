@@ -1,17 +1,12 @@
+import { USER_DETAILS_ERRORS } from "../../constants/errors/errorsConstants";
+import { UserDetailsEntity } from "../../domain/entity/UserDetailsEntity";
 import UserDetailsRepositoryInterface from "../../domain/repository/interfaces/UserDetailsRepositoryInterface";
 import { AuthRegisterRequest } from "../../infrastructure/models/request/auth/AuthRegisterRequest";
 import { BaseResponse } from "../../infrastructure/models/response/common/baseResponse";
 import { UserDetailsResponse } from "../../infrastructure/models/response/UserDetailReponse";
-import { errorResponse, successResponse } from "../../utils/HttpUtils";
+import { handleBusinessOperation } from "../../utils/errorHandler";
+import { successResponse } from "../../utils/HttpUtils";
 import { UserDetailService } from "../service/UserDetailService";
-
-type UserDetailsRow = {
-    userId: number;
-    fullName?: string | null;
-    phoneNumber?: string | null;
-    country?: string | null;
-    preferredLanguage?: string | null;
-}
 
 export class UserDetailsBusiness implements UserDetailService {
 
@@ -27,25 +22,20 @@ export class UserDetailsBusiness implements UserDetailService {
     }
 
     async findById(id: number): Promise<BaseResponse<UserDetailsResponse>> {
-        try {
-            const userDetail = await this.userDetailRepository.findUserDetailsByUserId(id);
+        const userDetail = await handleBusinessOperation(
+            async () => await this.userDetailRepository.findUserDetailsByUserId(id),
+            USER_DETAILS_ERRORS.FIND_BY_ID
+        ) as UserDetailsEntity
 
-            if (!userDetail) {
-                return errorResponse("Detalle de usuario no encontrado", [`No se encontró detalle para el usuario con id: ${id}`], 200);
-            }
-
-            const data: UserDetailsResponse = {
-                userId: userDetail.userId,
-                fullName: userDetail.fullName!,
-                phoneNumber: userDetail.phoneNumber!,
-                country: userDetail.country!,
-                preferredLanguage: userDetail.preferredLanguage!
-            }
-
-            return successResponse<UserDetailsResponse>("Detalle de usuario encontrado con éxito", data, 200);
-        } catch (error: any) {
-            return errorResponse("Error interno del servidor", error.message, 500);
+        const data: UserDetailsResponse = {
+            userId: userDetail.userId,
+            fullName: userDetail.fullName!,
+            phoneNumber: userDetail.phoneNumber!,
+            country: userDetail.country!,
+            preferredLanguage: userDetail.preferredLanguage!
         }
+
+        return successResponse<UserDetailsResponse>("Detalle de usuario encontrado con éxito", data, 200);
     }
 
     findAll(): Promise<UserDetailsResponse[]> {

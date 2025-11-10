@@ -3,6 +3,7 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 import { UserDetailsBusiness } from "../../../../application/business/UserDetailsBusiness";
 import { UserDetailsRespository } from "../../../../domain/repository/UserDetailsRepostory";
 import { buildLambdaResponse, LambdaResponse } from "../../../../utils/HttpUtils";
+import { errorHandlerMiddleware } from "../../../middlewares/errorHandlerMiddleware";
 import AuthMiddlewares from "../../../security/middlewares/authMiddlewares";
 
 const userRepository = new UserDetailsRespository();
@@ -18,3 +19,4 @@ export async function findUserDetailByUserIdhandler(
 export const handler = middy(findUserDetailByUserIdhandler)
     .use(AuthMiddlewares.verifyJwt())
     .use(AuthMiddlewares.cheackRoles(['USER', 'ADMIN', 'PRODUCER']))
+    .use(errorHandlerMiddleware());

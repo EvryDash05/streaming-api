@@ -1,26 +1,28 @@
 import databaseClient from "../../infrastructure/config/database/databaseClient";
+import DatabaseErrorHelper from "../../utils/databaseError.helper";
+import loggerMessage from "../../utils/logger";
 import { AuthorityEntity } from "../entity/AuthoritiesEntity";
 import AuthorityRepositoryInterface from "./interfaces/AuthorityRepositoryInterface";
+import { FIND_AUTHORITIES_BY_ROLENAME_QUERY } from "./queries/authoritiesRepository.queries";
 
 export class AuthorityRepository implements AuthorityRepositoryInterface {
 
     async findAuthorityByRoleName(roleName: string): Promise<string[] | null> {
-        console.info(`Finding authorities by role name: ${roleName}`);
+        try {
+            loggerMessage.info(`Finding authorities by role name: ${roleName}`);
 
-        const result = await databaseClient.query<{name: string}>(
-            `SELECT a.id, a.name
-                FROM role_authorities ra
-                JOIN roles r ON ra.role_id = r.id
-                JOIN authorities a ON ra.authority_id = a.id
-                WHERE r.name = $1
-            `,
-            [roleName]
-        );
+            const result = await databaseClient.query<{ name: string }>(
+                FIND_AUTHORITIES_BY_ROLENAME_QUERY,
+                [roleName]
+            );
 
-        if (result.rows.length === 0) return null;
+            if (result.rows.length === 0) return null;
 
-        console.info("Authorities found:", result.rows);
-        return result.rows.map(row => row.name);
+            console.info("Authorities found:", result.rows);
+            return result.rows.map(row => row.name);
+        } catch (error) {
+            throw DatabaseErrorHelper.translate(error);
+        }
     }
 
     findById(id: number): Promise<AuthorityEntity | null> {

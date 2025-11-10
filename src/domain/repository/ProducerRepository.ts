@@ -1,7 +1,8 @@
 import databaseClient from "../../infrastructure/config/database/databaseClient";
 import { ProducerRequest } from "../../infrastructure/models/request/ProducerRequest";
+import DatabaseErrorHelper from "../../utils/databaseError.helper";
 import { Repository } from "./interfaces/Repository";
-
+import { SAVE_PRODUCER_QUERY } from "./queries/producerRepository.queries";
 
 export class ProducerRepository implements Repository<ProducerRequest, number> {
 
@@ -14,18 +15,19 @@ export class ProducerRepository implements Repository<ProducerRequest, number> {
     }
 
     async save(entity: ProducerRequest): Promise<number> {
-        const { user_id, institution_name, description, contact_email, contact_phone } = entity;
+        try {
+            const { user_id, institution_name, description, contact_email, contact_phone } = entity;
 
-        const result = await databaseClient.query<{ id: number }>(
-            'INSERT INTO producers (user_id, institution_name, description, contact_email, contact_phone) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-            [user_id, institution_name ?? null, description ?? null, contact_email ?? null, contact_phone ?? null]
-        );
+            const result = await databaseClient.query<{ id: number }>(
+                SAVE_PRODUCER_QUERY,
+                [user_id, institution_name ?? null, description ?? null, contact_email ?? null, contact_phone ?? null]
+            );
 
-        if (result.rows.length === 0) {
-            throw new Error("No se pudo crear el productor");
+            return result.rows[0]!.id;
+        } catch (error) {
+            throw DatabaseErrorHelper.translate(error);
+
         }
-
-        return result.rows[0]!.id;
     }
 
     update(entity: ProducerRequest): Promise<void> {

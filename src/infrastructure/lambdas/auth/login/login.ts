@@ -7,6 +7,7 @@ import { UserRepository } from "../../../../domain/repository/userRepository";
 import { AuthorityRepository } from "../../../../domain/repository/AuthorityRepository";
 import { jsonBodyParser } from "../../../middlewares/parsingMiddleware";
 import { zodValidator } from "../../../middlewares/validationMiddleware";
+import { errorHandlerMiddleware } from "../../../middlewares/errorHandlerMiddleware";
 
 /* Dependencies */
 const userRepository = new UserRepository();
@@ -23,3 +24,4 @@ export async function loginHandler(
 export const handler = middy(loginHandler)
     .use(jsonBodyParser())
     .use(zodValidator(AuthLoginRequest.validateSchema()))
+    .use(errorHandlerMiddleware());

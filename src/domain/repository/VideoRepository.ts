@@ -3,12 +3,22 @@ import DatabaseErrorHelper from "../../utils/databaseError.helper";
 import loggerMessage from "../../utils/logger";
 import { VideoEntity } from "../entity/VideosEntity";
 import { VideoRepositoryInterface } from "./interfaces/VideoRepositoryInterface";
-import { FIND_ALL_VIDEOS_QUERY, SAVE_VIDEO_QUERY } from "./queries/videoQueries";
+import { FIND_ALL_VIDEOS_QUERY, FIND_VIDEO_BY_ID_QUERY, SAVE_VIDEO_QUERY } from "./queries/videoQueries";
 
 class VideoRepository implements VideoRepositoryInterface {
 
-    findById(id: number): Promise<VideoEntity | null> {
-        throw new Error("Method not implemented.");
+    async findById(id: number): Promise<VideoEntity | null> {
+        try {
+            const result = await databaseClient.query<VideoEntity>(
+                FIND_VIDEO_BY_ID_QUERY,
+                [id],
+            );
+
+            return result.rows[0] || null;
+        } catch (error: Error | any) {
+            loggerMessage.error('Error to get video by id: ' + error.message);
+            throw DatabaseErrorHelper.translate(error);
+        }
     }
 
     async findAll(): Promise<VideoEntity[]> {

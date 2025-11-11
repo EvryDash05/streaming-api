@@ -11,6 +11,7 @@ export const REPOSITORY_ERRORS = {
 export const VIDEO_ERRORS = {
     METHOD_NOT_IMPLEMENTED: 'Method not implemented.',
     FIND_ALL: 'Error al obtener los videos',
+    FIND_BY_ID: 'Error al encontrar el video por id',
     SAVE: 'Error al guardar el video',
     DELETE: 'Error al eliminar el video',
     UPDATE: 'Error al actualizar el video',

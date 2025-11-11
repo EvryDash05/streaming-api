@@ -4,7 +4,7 @@ import { VideoResponse } from "../../infrastructure/models/response/VideoRespose
 
 export interface VideosService {
     saveVideo(request: VideoRequest, producerId: number): Promise<BaseResponse<number>>;
-    findVideoById(id: number): Promise<BaseResponse<string>>;
+    findVideoById(id: number): Promise<BaseResponse<VideoResponse>>;
     deleteVideoById(id: number): Promise<BaseResponse<boolean>>;
     findAllVideos(): Promise<BaseResponse<VideoResponse[]>>;
 }

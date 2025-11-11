@@ -63,6 +63,20 @@ Resources:
           Properties:
             Path: /videos/saveVideo
             Method: POST
+  
+  GetVideoByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/infrastructure/lambdas/videos/getVideoById/handler.handler
+      CodeUri: ../../../../dist
+      Runtime: nodejs20.x
+      Role: !Ref LAMBDA_EXECUTION_ROLE
+      Events:
+        Upload:
+          Type: Api
+          Properties:
+            Path: /videos/findById/{videoId}
+            Method: GET
 
   GeneratePresignedUrlFunction:
     Type: AWS::Serverless::Function

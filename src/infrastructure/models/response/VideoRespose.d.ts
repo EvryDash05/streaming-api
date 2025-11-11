@@ -1,7 +1,7 @@
 
 export interface VideoResponse {
     id: number;
-    producer_id: number;
+    producerId: number;
     title: string;
     description: string;
     url: string;

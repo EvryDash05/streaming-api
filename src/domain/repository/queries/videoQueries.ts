@@ -16,3 +16,21 @@ RETURNING id, title;
 export const FIND_ALL_VIDEOS_QUERY = `
     SELECT * FROM videos;    
 `
+
+/* export const FIND_VIDEO_BY_ID_QUERY = `
+    SELECT
+        producer_id,
+        title,
+        description,
+        url,
+        duration,
+        category,
+        created_by,
+        last_update_by
+    FROM videos WHERE id = $1;    
+` */
+
+export const FIND_VIDEO_BY_ID_QUERY = `
+    SELECT *
+    FROM videos WHERE id = $1;    
+`

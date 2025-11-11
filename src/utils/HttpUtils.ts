@@ -40,7 +40,12 @@ export function buildLambdaResponse<T = unknown>(
 ): LambdaResponse {
     return {
         statusCode,
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE",
+            "Access-Control-Allow-Headers": "Content-Type,Authorization",
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify(body),
-        headers: { "Content-Type": "application/json" },
     };
 }

@@ -8,6 +8,7 @@ import { handleBusinessOperation } from "../../utils/errorHandler";
 import { successResponse } from "../../utils/HttpUtils";
 import loggerMessage from "../../utils/logger";
 import { VideosService } from "../service/VideosService";
+import { BusinessError } from "../../infrastructure/exceptions/Exceptions";
 
 class VideosBusiness implements VideosService {
 
@@ -32,8 +33,22 @@ class VideosBusiness implements VideosService {
         return successResponse<number>('Video guardado con éxito', videoId, 201);
     }
 
-    findVideoById(id: number): Promise<BaseResponse<string>> {
-        throw new Error("Method not implemented.");
+    async findVideoById(id: number): Promise<BaseResponse<VideoResponse>> {
+        loggerMessage.info(`Find video by ID: ${id}`);
+
+        const response = await handleBusinessOperation(
+            async () => await this.videoRepository.findById(id),
+            VIDEO_ERRORS.FIND_BY_ID
+        )
+
+        if (!response) {
+            throw new BusinessError('Video no encontrado', {
+                detail: 'No existe un video con el ID proporcionado'
+            }, 404);
+        }
+
+        const videoResponse = this.mapToResponse(response!);
+        return successResponse<VideoResponse>('Video encontrado', videoResponse, 200);
     }
 
     deleteVideoById(id: number): Promise<BaseResponse<boolean>> {
@@ -70,7 +85,7 @@ class VideosBusiness implements VideosService {
     private mapToResponse(entity: VideoEntity): VideoResponse {
         return {
             id: entity.id!,
-            producer_id: entity.producer_id,
+            producerId: entity.producer_id,
             title: entity.title,
             description: entity.description!,
             url: entity.url,

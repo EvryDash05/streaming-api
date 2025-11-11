@@ -11,7 +11,8 @@ const userRepository = new UserDetailsRespository();
 export async function findUserDetailByUserIdhandler(
     event: APIGatewayProxyEvent
 ): Promise<LambdaResponse> {
-    const response = await new UserDetailsBusiness(userRepository).findById(Number(event.pathParameters?.userId));
+    const userId = Number(event.requestContext.authorizer?.jwt.sub);
+    const response = await new UserDetailsBusiness(userRepository).findById(userId);
     return buildLambdaResponse(response.statusCode, response);
 }
 

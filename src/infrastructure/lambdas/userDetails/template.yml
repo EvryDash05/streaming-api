@@ -44,6 +44,6 @@ Resources:
         Login:
           Type: Api
           Properties:
-            Path: /userDetails/findById/{userId}
+            Path: /userDetails
             Method: GET
 

@@ -1,13 +1,13 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
-import { buildLambdaResponse, LambdaResponse } from "../../../../utils/HttpUtils";
 import middy from "@middy/core";
-import { AuthLoginRequest } from "../../../models/request/auth/AuthLoginRequest";
+import { APIGatewayProxyEvent } from "aws-lambda";
 import { AuthBusiness } from "../../../../application/business/AuthBusiness";
-import { UserRepository } from "../../../../domain/repository/userRepository";
 import { AuthorityRepository } from "../../../../domain/repository/AuthorityRepository";
+import { UserRepository } from "../../../../domain/repository/userRepository";
+import { buildLambdaResponse, LambdaResponse } from "../../../../utils/HttpUtils";
+import { errorHandlerMiddleware } from "../../../middlewares/errorHandlerMiddleware";
 import { jsonBodyParser } from "../../../middlewares/parsingMiddleware";
 import { zodValidator } from "../../../middlewares/validationMiddleware";
-import { errorHandlerMiddleware } from "../../../middlewares/errorHandlerMiddleware";
+import { AuthLoginRequest } from "../../../models/request/auth/AuthLoginRequest";
 
 /* Dependencies */
 const userRepository = new UserRepository();

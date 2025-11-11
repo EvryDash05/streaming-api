@@ -1,17 +1,11 @@
 import middy from "@middy/core";
-import AuthMiddlewares from "../../../security/middlewares/authMiddlewares";
-import { APIGatewayProxyEvent } from "aws-lambda";
-import { buildLambdaResponse, LambdaResponse } from "../../../../utils/HttpUtils";
 import S3Business from "../../../../application/business/S3Business";
-import logger from "../../../../utils/logger";
+import { buildLambdaResponse, LambdaResponse } from "../../../../utils/HttpUtils";
 import { errorHandlerMiddleware } from "../../../middlewares/errorHandlerMiddleware";
+import AuthMiddlewares from "../../../security/middlewares/authMiddlewares";
 
-export async function generatePresignedUrlHandler(
-    event: APIGatewayProxyEvent
-): Promise<LambdaResponse> {
-    logger.info(`Role IAM: ` + process.env.LAMBDA_EXECUTION_ROLE!);
-    const response = await new S3Business().generatePresignedUrl(
-        process.env.S3_VIDEOS_BUCKET!,
+export async function generatePresignedUrlHandler(): Promise<LambdaResponse> {
+    const response = await new S3Business().generatePresignedUploadVideoUrl(
         `videos/${crypto.randomUUID()}.mp4`,
         3000
     );

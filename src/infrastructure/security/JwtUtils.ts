@@ -51,7 +51,6 @@ export async function createRefreshToken(payload: {
 
 export async function verifyJwtToken(token: string) {
     try {
-        logger.info('User generater: ' + process.env.SECURITY_JWT_USER_GENERATOR);
         const { payload } = await jose.jwtVerify(token, secret, {
             issuer: process.env.SECURITY_JWT_USER_GENERATOR!,
             algorithms: ['HS256']

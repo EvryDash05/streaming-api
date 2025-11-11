@@ -7,5 +7,4 @@ export interface VideosService {
     findVideoById(id: number): Promise<BaseResponse<VideoResponse>>;
     deleteVideoById(id: number): Promise<BaseResponse<boolean>>;
     findAllVideos(): Promise<BaseResponse<VideoResponse[]>>;
-    getVideoUrl(id: number): Promise<BaseResponse<string>>;
 }

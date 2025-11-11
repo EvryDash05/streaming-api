@@ -8,7 +8,9 @@ Globals:
     Timeout: 10
     Environment:
       Variables:
-        NODE_ENV: development
+        NODE_ENV: some_enviroment
+        # Frontend variables
+        FRONTEND_ORIGIN: some_origin
         # Security variables
         SECURITY_JWT_KEY: some_jwt_key
         SECURITY_JWT_ACCESS_EXPIRATION: some_access_expiration
@@ -24,6 +26,11 @@ Globals:
         S3_REGION: some_s3_region
         AWS_ACCESS_KEY_ID: some_aws_access_key_id
         AWS_SECRET_ACCESS_KEY: some_aws_secret_access_key
+  Api:
+    Cors:
+      AllowOrigin: "'http://localhost:3010,https://app.mi-dominio.com,http://localhost:5173'" 
+      AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
+      AllowHeaders: "'Content-Type,Authorization'"
 
 Resources:
   AuthStack:
@@ -31,44 +38,46 @@ Resources:
     Properties:
       Location: ./src/infrastructure/lambdas/auth/template.yml
       Parameters:
-        NODE_ENV: development
-        SECURITY_JWT_KEY: some_jwt_key
-        SECURITY_JWT_ACCESS_EXPIRATION: some_access_expiration
-        SECURITY_JWT_REFRESH_EXPIRATION: some_refresh_expiration
-        SECURITY_JWT_USER_GENERATOR: some_user_generator
-        SECURITY_JWT_HASHED_SECRET: some_hashed_secret
-        BCRYPT_SALT_ROUNDS: some_number
-        DATABASE_URL: some_db_url
+        NodeEnv: some_enviroment
+        SecurityJwtKey: some_jwt_key
+        SecurityJwtAccessExpiration: some_access_expiration
+        SecurityJwtRefreshExpiration: some_refresh_expiration
+        SecurityJwtUserGenerator: some_user_generator
+        SecurityJwtHashedSecret: some_hashed_secret
+        BcryptSaltRounds: some_number
+        DatabaseUrl: some_db_url
   
   userDetailsStack:
     Type: AWS::Serverless::Application
     Properties:
       Location: ./src/infrastructure/lambdas/userDetails/template.yml
       Parameters:
-        NODE_ENV: development
-        SECURITY_JWT_KEY: some_jwt_key
-        SECURITY_JWT_ACCESS_EXPIRATION: some_access_expiration
-        SECURITY_JWT_REFRESH_EXPIRATION: some_refresh_expiration
-        SECURITY_JWT_USER_GENERATOR: some_user_generator
-        SECURITY_JWT_HASHED_SECRET: some_hashed_secret
-        BCRYPT_SALT_ROUNDS: some_number
-        DATABASE_URL: some_db_url
+        Parameters:
+        NodeEnv: some_enviroment
+        SecurityJwtKey: some_jwt_key
+        SecurityJwtAccessExpiration: some_access_expiration
+        SecurityJwtRefreshExpiration: some_refresh_expiration
+        SecurityJwtUserGenerator: some_user_generator
+        SecurityJwtHashedSecret: some_hashed_secret
+        BcryptSaltRounds: some_number
+        DatabaseUrl: some_db_url
+
 
   videosStack:
     Type: AWS::Serverless::Application
     Properties:
       Location: ./src/infrastructure/lambdas/videos/template.yml
       Parameters:
-        NODE_ENV: development
-        SECURITY_JWT_KEY: some_jwt_key
-        SECURITY_JWT_ACCESS_EXPIRATION: some_access_expiration
-        SECURITY_JWT_REFRESH_EXPIRATION: some_refresh_expiration
-        SECURITY_JWT_USER_GENERATOR: some_user_generator
-        SECURITY_JWT_HASHED_SECRET: some_hashed_secret
-        BCRYPT_SALT_ROUNDS: some_number
-        DATABASE_URL: some_db_url
-        LAMBDA_EXECUTION_ROLE: some_lambda_execution_role_arn
-        S3_VIDEOS_BUCKET: some_s3_bucket_name
-        S3_REGION: some_s3_region
-        AWS_ACCESS_KEY_ID: some_aws_access_key_id
-        AWS_SECRET_ACCESS_KEY: some_aws_secret_access_key
+        NodeEnv: some_enviroment
+        SecurityJwtKey: some_jwt_key
+        SecurityJwtAccessExpiration: some_access_expiration
+        SecurityJwtRefreshExpiration: some_refresh_expiration
+        SecurityJwtUserGenerator: some_user_generator
+        SecurityJwtHashedSecret: some_hashed_secret
+        BcryptSaltRounds: some_number
+        DatabaseUrl: some_db_url
+        LambdaExecutionRole: some_lambda_execution_role_arn
+        S3VideosBucket: some_s3_bucket_name
+        S3Region: some_s3_region
+        AwsAccessKeyId: some_aws_access_key_id
+        AwsSecretAccessKey: some_aws_secret_access_key

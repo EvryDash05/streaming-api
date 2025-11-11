@@ -105,4 +105,17 @@ Resources:
           Properties:
             Path: /videos/getVideos
             Method: GET
-
+  
+  GetVideoUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/infrastructure/lambdas/videos/getVideoUrl/handler.handler
+      CodeUri: ../../../../dist
+      Runtime: nodejs20.x
+      Role: !Ref LAMBDA_EXECUTION_ROLE
+      Events:
+        Upload:
+          Type: Api
+          Properties:
+            Path: /videos/getVideoUrl
+            Method: POST

@@ -14,3 +14,13 @@ parameter_overrides = "NodeEnv=\"production\" FrontendOrigin=\"*\" SecurityJwtKe
 
 [prod.global.parameters]
 region = "us-west-2"
+
+[production.deploy.parameters]
+stack_name = "streamin-api"
+resolve_s3 = true
+s3_prefix = "streamin-api"
+region = "us-west-2"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
+parameter_overrides = "NodeEnv=\"production\" FrontendOrigin=\"\\\"*\\\"\" SecurityJwtKey=\"08af2447a30c9c090b3595e6b45cead32eb587dcb1892aae31f073dcb31bce95\" SecurityJwtAccessExpiration=\"1800000\" SecurityJwtRefreshExpiration=\"86400000\" SecurityJwtUserGenerator=\"management_system\" SecurityJwtHashedSecret=\"d0DMBKNAbVqoX6cT00DEpB/T5atRfONxoJpgM7o+dCM=\" BcryptSaltRounds=\"10\" DatabaseUrl=\"postgresql://neondb_owner:npg_gl0TM1HIPCAc@ep-noisy-term-ac41up1k-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require\" LambdaExecutionRole=\"arn:aws:iam::275688773775:role/lambda_s3\" S3VideosBucket=\"api-streaming-bucket\" S3Region=\"us-west-2\""
+image_repositories = []

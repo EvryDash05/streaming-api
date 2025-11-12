@@ -5,6 +5,7 @@ import { errorHandlerMiddleware } from "../../../middlewares/errorHandlerMiddlew
 import AuthMiddlewares from "../../../security/middlewares/authMiddlewares";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import loggerMessage from "../../../../utils/logger";
+import { corsMiddleware } from "../../../middlewares/corsMiddleware";
 
 export async function generatePresignedGetVideoUrl(
     event: APIGatewayProxyEvent
@@ -23,4 +24,5 @@ export const handler = middy(generatePresignedGetVideoUrl)
     .use(AuthMiddlewares.verifyJwt())
     .use(AuthMiddlewares.cheackRoles(['PRODUCER']))
     .use(AuthMiddlewares.cheackPermissions(['UPLOAD_VIDEO']))
-    .use(errorHandlerMiddleware());
+    .use(errorHandlerMiddleware())
+    .use(corsMiddleware());    

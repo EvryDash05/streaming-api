@@ -1,5 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
+Description: Stack hijo de Videos usando API Gateway con CORS
 
 Parameters:
   NodeEnv:
@@ -41,6 +42,11 @@ Globals:
         LAMBDA_EXECUTION_ROLE: !Ref LambdaExecutionRole
         S3_VIDEOS_BUCKET: !Ref S3VideosBucket
         S3_REGION: !Ref S3Region
+  Api:
+    Cors:
+      AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
+      AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
 
 Resources:
   SaveVideoFunction:
@@ -142,4 +148,4 @@ Outputs:
     Description: "Endpoint para obtener la URL de un video"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/videos/getVideoUrl"
     Export:
-      Name: GetVideoUrlEndpoi
+      Name: GetVideoUrlEndpoint

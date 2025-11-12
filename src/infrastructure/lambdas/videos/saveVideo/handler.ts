@@ -8,6 +8,7 @@ import { jsonBodyParser } from "../../../middlewares/parsingMiddleware";
 import { zodValidator } from "../../../middlewares/validationMiddleware";
 import VideoRequest from "../../../models/request/VideoRequest";
 import AuthMiddlewares from "../../../security/middlewares/authMiddlewares";
+import { corsMiddleware } from "../../../middlewares/corsMiddleware";
 
 const videoRepository: VideoRepository = new VideoRepository();
 
@@ -27,4 +28,5 @@ export const handler = middy(saveVideoHandler)
     .use(AuthMiddlewares.verifyJwt())
     .use(AuthMiddlewares.cheackRoles(['PRODUCER']))
     .use(AuthMiddlewares.cheackPermissions(['UPLOAD_VIDEO']))
-    .use(errorHandlerMiddleware());
+    .use(errorHandlerMiddleware())
+    .use(corsMiddleware());

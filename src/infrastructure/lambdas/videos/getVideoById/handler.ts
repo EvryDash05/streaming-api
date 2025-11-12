@@ -6,6 +6,7 @@ import AuthMiddlewares from "../../../security/middlewares/authMiddlewares";
 import { errorHandlerMiddleware } from "../../../middlewares/errorHandlerMiddleware";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import loggerMessage from "../../../../utils/logger";
+import { corsMiddleware } from "../../../middlewares/corsMiddleware";
 
 const videoRepository: VideoRepository = new VideoRepository();
 
@@ -23,3 +24,4 @@ export const handler = middy(findVideoById)
     .use(AuthMiddlewares.cheackRoles(['USER', 'PRODUCER']))
     .use(AuthMiddlewares.cheackPermissions(['VIEW_CONTENT']))
     .use(errorHandlerMiddleware())
+    .use(corsMiddleware());

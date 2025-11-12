@@ -22,6 +22,11 @@ Globals:
         S3_REGION: !Ref S3Region
         # AWS_ACCESS_KEY_ID: !Ref AwsAccessKeyId
         # AWS_SECRET_ACCESS_KEY: !Ref AwsSecretAccessKey
+  Api:
+    Cors:
+      AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
+      AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
 
 Parameters:
   NodeEnv:

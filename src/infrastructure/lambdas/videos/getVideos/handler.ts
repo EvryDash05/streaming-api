@@ -4,6 +4,8 @@ import VideoRepository from "../../../../domain/repository/VideoRepository";
 import { buildLambdaResponse, LambdaResponse } from "../../../../utils/HttpUtils";
 import AuthMiddlewares from "../../../security/middlewares/authMiddlewares";
 import { errorHandlerMiddleware } from "../../../middlewares/errorHandlerMiddleware";
+import cors from "@middy/http-cors";
+import { corsMiddleware } from "../../../middlewares/corsMiddleware";
 
 const videoRepository: VideoRepository = new VideoRepository();
 
@@ -17,3 +19,4 @@ export const handler = middy(saveVideoHandler)
     .use(AuthMiddlewares.cheackRoles(['USER', 'PRODUCER']))
     .use(AuthMiddlewares.cheackPermissions(['VIEW_CONTENT']))
     .use(errorHandlerMiddleware())
+    .use(corsMiddleware());    

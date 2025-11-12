@@ -5,6 +5,7 @@ import { UserDetailsRespository } from "../../../../domain/repository/UserDetail
 import { buildLambdaResponse, LambdaResponse } from "../../../../utils/HttpUtils";
 import { errorHandlerMiddleware } from "../../../middlewares/errorHandlerMiddleware";
 import AuthMiddlewares from "../../../security/middlewares/authMiddlewares";
+import { corsMiddleware } from "../../../middlewares/corsMiddleware";
 
 const userRepository = new UserDetailsRespository();
 
@@ -20,4 +21,5 @@ export async function findUserDetailByUserIdhandler(
 export const handler = middy(findUserDetailByUserIdhandler)
     .use(AuthMiddlewares.verifyJwt())
     .use(AuthMiddlewares.cheackRoles(['USER', 'ADMIN', 'PRODUCER']))
-    .use(errorHandlerMiddleware());
+    .use(errorHandlerMiddleware())
+    .use(corsMiddleware());

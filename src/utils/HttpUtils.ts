@@ -1,3 +1,4 @@
+import { get } from "http";
 import { BaseResponse } from "../infrastructure/models/response/common/baseResponse";
 
 export interface LambdaResponse<T = any> {
@@ -34,6 +35,13 @@ export function errorResponse<T = unknown>(
     };
 }
 
+export const getCorsHeaders = () => ({
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token',
+    'Access-Control-Allow-Methods': 'OPTIONS,GET,POST,PUT,DELETE',
+    'Content-Type': 'application/json'
+});
+
 export function buildLambdaResponse<T = unknown>(
     statusCode: number,
     body: BaseResponse<T>
@@ -41,11 +49,6 @@ export function buildLambdaResponse<T = unknown>(
     return {
         statusCode,
         body: JSON.stringify(body),
-        headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "http://localhost:3010,http://localhost:5173",
-            "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-            "Access-Control-Allow-Headers": "Content-Type,Authorization"
-        }
+        headers: getCorsHeaders()
     };
 }

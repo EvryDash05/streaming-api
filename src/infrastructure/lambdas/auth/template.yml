@@ -32,6 +32,11 @@ Globals:
         SECURITY_JWT_HASHED_SECRET: !Ref SecurityJwtHashedSecret
         BCRYPT_SALT_ROUNDS: !Ref BcryptSaltRounds
         DATABASE_URL: !Ref DatabaseUrl
+  Api:
+    Cors:
+      AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
+      AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
 
 Resources:
   AuthLoginFunction:

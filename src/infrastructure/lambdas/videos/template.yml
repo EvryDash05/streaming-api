@@ -18,17 +18,11 @@ Parameters:
     Type: String
   DatabaseUrl:
     Type: String
-
-  # S3 Parameters
   LambdaExecutionRole:
     Type: String
   S3VideosBucket:
     Type: String
   S3Region:
-    Type: String
-  AwsAccessKeyId:
-    Type: String
-  AwsSecretAccessKey:
     Type: String
 
 Globals:
@@ -47,8 +41,6 @@ Globals:
         LAMBDA_EXECUTION_ROLE: !Ref LambdaExecutionRole
         S3_VIDEOS_BUCKET: !Ref S3VideosBucket
         S3_REGION: !Ref S3Region
-        AWS_ACCESS_KEY_ID: !Ref AwsAccessKeyId
-        AWS_SECRET_ACCESS_KEY: !Ref AwsSecretAccessKey
 
 Resources:
   SaveVideoFunction:
@@ -120,3 +112,34 @@ Resources:
           Properties:
             Path: /videos/getVideoUrl
             Method: POST
+
+Outputs:
+  SaveVideoEndpoint:
+    Description: "Endpoint para guardar videos"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/videos/saveVideo"
+    Export:
+      Name: SaveVideoEndpoint
+
+  GetVideoByIdEndpoint:
+    Description: "Endpoint para obtener video por ID"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/videos/findById/{videoId}"
+    Export:
+      Name: GetVideoByIdEndpoint
+
+  GeneratePresignedUrlEndpoint:
+    Description: "Endpoint para generar URL presignada"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/videos/generatePresignedUrl"
+    Export:
+      Name: GeneratePresignedUrlEndpoint
+
+  GetVideosEndpoint:
+    Description: "Endpoint para obtener todos los videos"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/videos/getVideos"
+    Export:
+      Name: GetVideosEndpoint
+
+  GetVideoUrlEndpoint:
+    Description: "Endpoint para obtener la URL de un video"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/videos/getVideoUrl"
+    Export:
+      Name: GetVideoUrlEndpoi

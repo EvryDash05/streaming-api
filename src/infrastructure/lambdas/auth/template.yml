@@ -72,3 +72,22 @@ Resources:
           Properties:
             Path: /auth/refresh
             Method: POST
+
+Outputs:
+  AuthLoginEndpoint:
+    Description: "Endpoint para login"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/auth/login"
+    Export:
+      Name: AuthLoginEndpoint
+
+  AuthRegisterEndpoint:
+    Description: "Endpoint para registro"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/auth/register"
+    Export:
+      Name: AuthRegisterEndpoint
+
+  AuthRefreshEndpoint:
+    Description: "Endpoint para refresh de tokens"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/auth/refresh"
+    Export:
+      Name: AuthRefreshEndpoint

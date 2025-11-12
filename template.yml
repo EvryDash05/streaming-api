@@ -20,14 +20,8 @@ Globals:
         LAMBDA_EXECUTION_ROLE: !Ref LambdaExecutionRole
         S3_VIDEOS_BUCKET: !Ref S3VideosBucket
         S3_REGION: !Ref S3Region
-        AWS_ACCESS_KEY_ID: !Ref AwsAccessKeyId
-        AWS_SECRET_ACCESS_KEY: !Ref AwsSecretAccessKey
-
-  Api:
-    Cors:
-      AllowOrigin: "'http://localhost:3010,https://app.mi-dominio.com,http://localhost:5173'"
-      AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
-      AllowHeaders: "'Content-Type,Authorization'"
+        # AWS_ACCESS_KEY_ID: !Ref AwsAccessKeyId
+        # AWS_SECRET_ACCESS_KEY: !Ref AwsSecretAccessKey
 
 Parameters:
   NodeEnv:
@@ -54,10 +48,10 @@ Parameters:
     Type: String
   S3Region:
     Type: String
-  AwsAccessKeyId:
-    Type: String
-  AwsSecretAccessKey:
-    Type: String
+  # AwsAccessKeyId:
+  #  Type: String
+  # AwsSecretAccessKey:
+  #  Type: String
 
 Resources:
   AuthStack:
@@ -104,5 +98,5 @@ Resources:
         LambdaExecutionRole: !Ref LambdaExecutionRole
         S3VideosBucket: !Ref S3VideosBucket
         S3Region: !Ref S3Region
-        AwsAccessKeyId: !Ref AwsAccessKeyId
-        AwsSecretAccessKey: !Ref AwsSecretAccessKey
+        # AwsAccessKeyId: !Ref AwsAccessKeyId
+        # AwsSecretAccessKey: !Ref AwsSecretAccessKey

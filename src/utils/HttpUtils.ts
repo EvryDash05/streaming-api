@@ -42,7 +42,10 @@ export function buildLambdaResponse<T = unknown>(
         statusCode,
         body: JSON.stringify(body),
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "http://localhost:3010,http://localhost:5173",
+            "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+            "Access-Control-Allow-Headers": "Content-Type,Authorization"
         }
     };
 }

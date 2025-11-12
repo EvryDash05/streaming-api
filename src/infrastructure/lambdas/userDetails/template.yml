@@ -46,3 +46,10 @@ Resources:
           Properties:
             Path: /userDetails
             Method: GET
+
+Outputs:
+  GetUserDetailsEndpoint:
+    Description: "Endpoint para obtener detalles de usuario"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/userDetails"
+    Export:
+      Name: GetUserDetailsEndpoint

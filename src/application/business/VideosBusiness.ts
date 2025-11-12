@@ -9,10 +9,12 @@ import { successResponse } from "../../utils/HttpUtils";
 import loggerMessage from "../../utils/logger";
 import { VideosService } from "../service/VideosService";
 import { BusinessError } from "../../infrastructure/exceptions/Exceptions";
+import { ProducerRepository } from "../../domain/repository/ProducerRepository";
 
 class VideosBusiness implements VideosService {
 
     private readonly videoRepository: VideoRepositoryInterface;
+    private readonly producerRepository: ProducerRepository = new ProducerRepository();
 
     public constructor(
         videoRepository: VideoRepositoryInterface,
@@ -21,9 +23,18 @@ class VideosBusiness implements VideosService {
     }
 
     async saveVideo(request: VideoRequest, producerId: number): Promise<BaseResponse<number>> {
-        loggerMessage.info('Saving video for producer ID: ' + request);
 
-        const entity = this.mapToEntity(request, producerId);
+        const { id } = await this.producerRepository.findByUserId(producerId);
+
+        console.log('Producer ID found:', id);
+
+        if (!id) {
+            throw new BusinessError('Productor no encontrado', {
+                detail: 'No existe un productor con el ID proporcionado'
+            }, 404);
+        }
+
+        const entity = this.mapToEntity(request, id);
         const videoId = await handleBusinessOperation(
             async () => await this.videoRepository.save(entity),
             VIDEO_ERRORS.SAVE

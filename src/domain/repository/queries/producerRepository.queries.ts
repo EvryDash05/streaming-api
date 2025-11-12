@@ -5,3 +5,8 @@ export const SAVE_PRODUCER_QUERY = `
     RETURNING id;
 `;
 
+export const FIND_PRODUCER_BY_USER_ID_QUERY = `
+    SELECT id, user_id, institution_name, description, contact_email, contact_phone 
+    FROM producers 
+    WHERE user_id = $1;
+`

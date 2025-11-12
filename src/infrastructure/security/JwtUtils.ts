@@ -1,5 +1,4 @@
 import * as jose from 'jose';
-import logger from '../../utils/logger';
 
 interface JwtPayload extends jose.JWTPayload {
     sub: string;

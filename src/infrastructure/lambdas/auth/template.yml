@@ -37,7 +37,7 @@ Resources:
   AuthLoginFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/infrastructure/lambdas/auth/login.handler
+      Handler: src/infrastructure/lambdas/auth/login/login.handler
       CodeUri: ../../../../dist
       Runtime: nodejs20.x
       Events:
@@ -50,7 +50,7 @@ Resources:
   AuthRegisterFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/infrastructure/lambdas/auth/register.handler
+      Handler: src/infrastructure/lambdas/auth/regsiter/register.handler
       CodeUri: ../../../../dist
       Runtime: nodejs20.x
       Events:

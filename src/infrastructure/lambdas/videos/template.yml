@@ -2,32 +2,33 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  NODE_ENV:
+  NodeEnv:
     Type: String
-  SECURITY_JWT_KEY:
-   Type: String
-  SECURITY_JWT_ACCESS_EXPIRATION:
-   Type: String
-  SECURITY_JWT_REFRESH_EXPIRATION:
-   Type: String
-  SECURITY_JWT_USER_GENERATOR:
-   Type: String
-  SECURITY_JWT_HASHED_SECRET:
-   Type: String
-  BCRYPT_SALT_ROUNDS:
+  SecurityJwtKey:
     Type: String
-  DATABASE_URL:
+  SecurityJwtAccessExpiration:
     Type: String
-  # S3 Paramenters
-  LAMBDA_EXECUTION_ROLE: 
-    type: string
-  S3_VIDEOS_BUCKET:
-    type: string
-  S3_REGION: 
-    type: string
-  AWS_ACCESS_KEY_ID:
+  SecurityJwtRefreshExpiration:
     Type: String
-  AWS_SECRET_ACCESS_KEY:
+  SecurityJwtUserGenerator:
+    Type: String
+  SecurityJwtHashedSecret:
+    Type: String
+  BcryptSaltRounds:
+    Type: String
+  DatabaseUrl:
+    Type: String
+
+  # S3 Parameters
+  LambdaExecutionRole:
+    Type: String
+  S3VideosBucket:
+    Type: String
+  S3Region:
+    Type: String
+  AwsAccessKeyId:
+    Type: String
+  AwsSecretAccessKey:
     Type: String
 
 Globals:
@@ -35,19 +36,19 @@ Globals:
     Timeout: 30
     Environment:
       Variables:
-        NODE_ENV: !Ref NODE_ENV
-        SECURITY_JWT_KEY: !Ref SECURITY_JWT_KEY
-        SECURITY_JWT_ACCESS_EXPIRATION: !Ref SECURITY_JWT_ACCESS_EXPIRATION
-        SECURITY_JWT_REFRESH_EXPIRATION: !Ref SECURITY_JWT_REFRESH_EXPIRATION
-        SECURITY_JWT_USER_GENERATOR: !Ref SECURITY_JWT_USER_GENERATOR
-        SECURITY_JWT_HASHED_SECRET: !Ref SECURITY_JWT_HASHED_SECRET
-        BCRYPT_SALT_ROUNDS: !Ref BCRYPT_SALT_ROUNDS
-        DATABASE_URL: !Ref DATABASE_URL
-        LAMBDA_EXECUTION_ROLE: !Ref LAMBDA_EXECUTION_ROLE
-        S3_VIDEOS_BUCKET: !Ref S3_VIDEOS_BUCKET
-        S3_REGION: !Ref S3_REGION
-        AWS_ACCESS_KEY_ID: !Ref AWS_ACCESS_KEY_ID
-        AWS_SECRET_ACCESS_KEY: !Ref AWS_SECRET_ACCESS_KEY
+        NODE_ENV: !Ref NodeEnv
+        SECURITY_JWT_KEY: !Ref SecurityJwtKey
+        SECURITY_JWT_ACCESS_EXPIRATION: !Ref SecurityJwtAccessExpiration
+        SECURITY_JWT_REFRESH_EXPIRATION: !Ref SecurityJwtRefreshExpiration
+        SECURITY_JWT_USER_GENERATOR: !Ref SecurityJwtUserGenerator
+        SECURITY_JWT_HASHED_SECRET: !Ref SecurityJwtHashedSecret
+        BCRYPT_SALT_ROUNDS: !Ref BcryptSaltRounds
+        DATABASE_URL: !Ref DatabaseUrl
+        LAMBDA_EXECUTION_ROLE: !Ref LambdaExecutionRole
+        S3_VIDEOS_BUCKET: !Ref S3VideosBucket
+        S3_REGION: !Ref S3Region
+        AWS_ACCESS_KEY_ID: !Ref AwsAccessKeyId
+        AWS_SECRET_ACCESS_KEY: !Ref AwsSecretAccessKey
 
 Resources:
   SaveVideoFunction:
@@ -56,23 +57,23 @@ Resources:
       Handler: src/infrastructure/lambdas/videos/saveVideo/handler.handler
       CodeUri: ../../../../dist
       Runtime: nodejs20.x
-      Role: !Ref LAMBDA_EXECUTION_ROLE
+      Role: !Ref LambdaExecutionRole
       Events:
-        Upload:
+        SaveVideo:
           Type: Api
           Properties:
             Path: /videos/saveVideo
             Method: POST
-  
+
   GetVideoByIdFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/infrastructure/lambdas/videos/getVideoById/handler.handler
       CodeUri: ../../../../dist
       Runtime: nodejs20.x
-      Role: !Ref LAMBDA_EXECUTION_ROLE
+      Role: !Ref LambdaExecutionRole
       Events:
-        Upload:
+        GetVideoById:
           Type: Api
           Properties:
             Path: /videos/findById/{videoId}
@@ -84,9 +85,9 @@ Resources:
       Handler: src/infrastructure/lambdas/videos/generatePresignedUrl/handler.handler
       CodeUri: ../../../../dist
       Runtime: nodejs20.x
-      Role: !Ref LAMBDA_EXECUTION_ROLE
+      Role: !Ref LambdaExecutionRole
       Events:
-        Upload:
+        GeneratePresignedUrl:
           Type: Api
           Properties:
             Path: /videos/generatePresignedUrl
@@ -98,23 +99,23 @@ Resources:
       Handler: src/infrastructure/lambdas/videos/getVideos/handler.handler
       CodeUri: ../../../../dist
       Runtime: nodejs20.x
-      Role: !Ref LAMBDA_EXECUTION_ROLE
+      Role: !Ref LambdaExecutionRole
       Events:
-        Upload:
+        GetVideos:
           Type: Api
           Properties:
             Path: /videos/getVideos
             Method: GET
-  
+
   GetVideoUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/infrastructure/lambdas/videos/getVideoUrl/handler.handler
       CodeUri: ../../../../dist
       Runtime: nodejs20.x
-      Role: !Ref LAMBDA_EXECUTION_ROLE
+      Role: !Ref LambdaExecutionRole
       Events:
-        Upload:
+        GetVideoUrl:
           Type: Api
           Properties:
             Path: /videos/getVideoUrl

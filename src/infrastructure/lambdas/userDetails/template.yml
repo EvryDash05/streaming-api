@@ -2,21 +2,21 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  NODE_ENV:
+  NodeEnv:
     Type: String
-  SECURITY_JWT_KEY:
+  SecurityJwtKey:
     Type: String
-  SECURITY_JWT_ACCESS_EXPIRATION:
+  SecurityJwtAccessExpiration:
     Type: String
-  SECURITY_JWT_REFRESH_EXPIRATION:
+  SecurityJwtRefreshExpiration:
     Type: String
-  SECURITY_JWT_USER_GENERATOR:
+  SecurityJwtUserGenerator:
     Type: String
-  SECURITY_JWT_HASHED_SECRET:
+  SecurityJwtHashedSecret:
     Type: String
-  BCRYPT_SALT_ROUNDS:
+  BcryptSaltRounds:
     Type: String
-  DATABASE_URL:
+  DatabaseUrl:
     Type: String
 
 Globals:
@@ -24,14 +24,14 @@ Globals:
     Timeout: 30
     Environment:
       Variables:
-        NODE_ENV: !Ref NODE_ENV
-        SECURITY_JWT_KEY: !Ref SECURITY_JWT_KEY
-        SECURITY_JWT_ACCESS_EXPIRATION: !Ref SECURITY_JWT_ACCESS_EXPIRATION
-        SECURITY_JWT_REFRESH_EXPIRATION: !Ref SECURITY_JWT_REFRESH_EXPIRATION
-        SECURITY_JWT_USER_GENERATOR: !Ref SECURITY_JWT_USER_GENERATOR
-        SECURITY_JWT_HASHED_SECRET: !Ref SECURITY_JWT_HASHED_SECRET
-        BCRYPT_SALT_ROUNDS: !Ref BCRYPT_SALT_ROUNDS
-        DATABASE_URL: !Ref DATABASE_URL
+        NODE_ENV: !Ref NodeEnv
+        SECURITY_JWT_KEY: !Ref SecurityJwtKey
+        SECURITY_JWT_ACCESS_EXPIRATION: !Ref SecurityJwtAccessExpiration
+        SECURITY_JWT_REFRESH_EXPIRATION: !Ref SecurityJwtRefreshExpiration
+        SECURITY_JWT_USER_GENERATOR: !Ref SecurityJwtUserGenerator
+        SECURITY_JWT_HASHED_SECRET: !Ref SecurityJwtHashedSecret
+        BCRYPT_SALT_ROUNDS: !Ref BcryptSaltRounds
+        DATABASE_URL: !Ref DatabaseUrl
 
 Resources:
   FindUserDetailsByUserIdFunction:
@@ -41,9 +41,8 @@ Resources:
       CodeUri: ../../../../dist
       Runtime: nodejs20.x
       Events:
-        Login:
+        GetUserDetails:
           Type: Api
           Properties:
             Path: /userDetails
             Method: GET
-

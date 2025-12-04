@@ -4,12 +4,24 @@ import DatabaseErrorHelper from "../../utils/databaseError.helper";
 import logger from "../../utils/logger";
 import { UserEntity } from "../entity/UsersEntity";
 import { UserRepositoryInterface, UserRow } from "./interfaces/UserRepositoryInterface";
-import { FIND_USER_BY_EMAIL_QUERY, INSERT_PRODUCER_QUERY, INSERT_USER_DETAILS_QUERY, INSERT_USER_QUERY, INSERT_USER_ROLE_QUERY } from "./queries/userRepository.queries";
+import { FIND_USER_BY_EMAIL_QUERY, FIND_USER_BY_ID_QUERY, INSERT_PRODUCER_QUERY, INSERT_USER_DETAILS_QUERY, INSERT_USER_QUERY, INSERT_USER_ROLE_QUERY } from "./queries/userRepository.queries";
 
 export class UserRepository implements UserRepositoryInterface {
 
     async findById(id: number): Promise<UserEntity | null> {
-        throw new Error("Method not implemented.");
+        try {
+            const result = await databaseClient.query<UserEntity>(
+                FIND_USER_BY_ID_QUERY,
+                [id]
+            );
+
+            if (result.rows.length === 0) return null;
+
+            return result.rows[0]!;
+        } catch (error) {
+            logger.info(`Error finding user by id: ${id} - ${error}`);
+            throw DatabaseErrorHelper.translate(error);
+        }
     }
 
     findAll(): Promise<UserEntity[]> {
@@ -46,7 +58,7 @@ export class UserRepository implements UserRepositoryInterface {
                 );
             }
 
-            
+
             await client.query("COMMIT");
             return userId;
         } catch (err) {

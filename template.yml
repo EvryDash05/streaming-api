@@ -105,3 +105,18 @@ Resources:
         S3Region: !Ref S3Region
         # AwsAccessKeyId: !Ref AwsAccessKeyId
         # AwsSecretAccessKey: !Ref AwsSecretAccessKey
+    
+  subscriptionStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./src/infrastructure/lambdas/subscription/template.yml
+      Parameters:
+        NodeEnv: !Ref NodeEnv
+        SecurityJwtKey: !Ref SecurityJwtKey
+        SecurityJwtAccessExpiration: !Ref SecurityJwtAccessExpiration
+        SecurityJwtRefreshExpiration: !Ref SecurityJwtRefreshExpiration
+        SecurityJwtUserGenerator: !Ref SecurityJwtUserGenerator
+        SecurityJwtHashedSecret: !Ref SecurityJwtHashedSecret
+        BcryptSaltRounds: !Ref BcryptSaltRounds
+        DatabaseUrl: !Ref DatabaseUrl
+        

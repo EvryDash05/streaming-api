@@ -41,3 +41,10 @@ export const FIND_USER_BY_EMAIL_QUERY = `
   FROM users
   WHERE email = $1;
 `;
+
+export const FIND_USER_BY_ID_QUERY = `
+  SELECT 
+    id 
+  FROM users
+  WHERE id = $1;
+`;

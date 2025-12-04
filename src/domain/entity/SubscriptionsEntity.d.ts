@@ -1,11 +1,12 @@
 export type SubscriptionStatusEntity = 'active' | 'inactive' | 'canceled';
 
 export interface SubscriptionEntity {
-  id: number;
+  id?: number;
   user_id: number;
-  price: string; // Prisma Decimal -> string
-  start_date: string; // date string
-  end_date: string; // date string
+  plan_id: number;
+  price?: string; // Prisma Decimal -> string
+  start_date?: string; // date string
+  end_date?: string; // date string
   status?: SubscriptionStatusEntity | null;
   created_by: string;
   created_at?: string | null;

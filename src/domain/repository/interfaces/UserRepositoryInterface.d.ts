@@ -8,7 +8,7 @@ type UserRow = {
     passwordHash: string;
 };
 
-interface UserRepositoryInterface extends Repository<UserEntity, number> {
+export interface UserRepositoryInterface extends Repository<UserEntity, number> {
     findUserByEmailAndPassword(email: string, password: string): Promise<UserRow | null>;
 }
 

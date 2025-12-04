@@ -20,8 +20,9 @@ Globals:
         LAMBDA_EXECUTION_ROLE: !Ref LambdaExecutionRole
         S3_VIDEOS_BUCKET: !Ref S3VideosBucket
         S3_REGION: !Ref S3Region
-        # AWS_ACCESS_KEY_ID: !Ref AwsAccessKeyId
-        # AWS_SECRET_ACCESS_KEY: !Ref AwsSecretAccessKey
+        MP_ACCESS_TOKEN: !Ref MpAcessToken 
+        MP_PUBLIC_KEY: !Ref MpPublicKey
+
   Api:
     Cors:
       AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
@@ -53,10 +54,10 @@ Parameters:
     Type: String
   S3Region:
     Type: String
-  # AwsAccessKeyId:
-  #  Type: String
-  # AwsSecretAccessKey:
-  #  Type: String
+  MpAcessToken:
+    Type: String
+  MpPublicKey:
+    Type: String
 
 Resources:
   AuthStack:
@@ -119,4 +120,6 @@ Resources:
         SecurityJwtHashedSecret: !Ref SecurityJwtHashedSecret
         BcryptSaltRounds: !Ref BcryptSaltRounds
         DatabaseUrl: !Ref DatabaseUrl
+        MpAcessToken: !Ref MpAcessToken
+        MpPublicKey: !Ref MpPublicKey
         

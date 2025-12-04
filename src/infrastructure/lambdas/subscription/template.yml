@@ -18,6 +18,10 @@ Parameters:
     Type: String
   DatabaseUrl:
     Type: String
+  MpAcessToken:
+    Type: String
+  MpPublicKey:
+    Type: String
 
 Globals:
   Function:
@@ -32,6 +36,8 @@ Globals:
         SECURITY_JWT_HASHED_SECRET: !Ref SecurityJwtHashedSecret
         BCRYPT_SALT_ROUNDS: !Ref BcryptSaltRounds
         DATABASE_URL: !Ref DatabaseUrl
+        MP_ACCESS_TOKEN: !Ref MpAcessToken
+        MP_PUBLIC_KEY: !Ref MpPublicKey
   Api:
     Cors:
       AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"

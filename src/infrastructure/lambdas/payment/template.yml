@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  NodeEnv:
+    Type: String
+  SecurityJwtKey:
+    Type: String
+  SecurityJwtAccessExpiration:
+    Type: String
+  SecurityJwtRefreshExpiration:
+    Type: String
+  SecurityJwtUserGenerator:
+    Type: String
+  SecurityJwtHashedSecret:
+    Type: String
+  BcryptSaltRounds:
+    Type: String
+  DatabaseUrl:
+    Type: String
+  MpAcessToken:
+    Type: String
+  MpPublicKey:
+    Type: String
+
+Globals:
+  Function:
+    Timeout: 30
+    Environment:
+      Variables:
+        NODE_ENV: !Ref NodeEnv
+        SECURITY_JWT_KEY: !Ref SecurityJwtKey
+        SECURITY_JWT_ACCESS_EXPIRATION: !Ref SecurityJwtAccessExpiration
+        SECURITY_JWT_REFRESH_EXPIRATION: !Ref SecurityJwtRefreshExpiration
+        SECURITY_JWT_USER_GENERATOR: !Ref SecurityJwtUserGenerator
+        SECURITY_JWT_HASHED_SECRET: !Ref SecurityJwtHashedSecret
+        BCRYPT_SALT_ROUNDS: !Ref BcryptSaltRounds
+        DATABASE_URL: !Ref DatabaseUrl
+        MP_ACCESS_TOKEN: !Ref MpAcessToken
+        MP_PUBLIC_KEY: !Ref MpPublicKey
+  Api:
+    Cors:
+      AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
+      AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
+
+Resources:
+  PaySubscriptionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/infrastructure/lambdas/payment/paySubscription/handler.handler
+      CodeUri: ../../../../dist
+      Runtime: nodejs20.x
+      Events:
+        PaySubscription:
+          Type: Api
+          Properties:
+            Path: /pay-subscription
+            Method: POST
+
+Outputs:
+  paySubscriptionEndpoint:
+    Description: "Endpoint para suscribirse"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/payment/pay-subscription"
+    Export:
+      Name: paySubscriptionEndpoint
+      
+

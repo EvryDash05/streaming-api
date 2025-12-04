@@ -54,7 +54,7 @@ Parameters:
     Type: String
   S3Region:
     Type: String
-  MpAcessToken:
+  MpAccessToken:
     Type: String
   MpPublicKey:
     Type: String
@@ -107,7 +107,7 @@ Resources:
         # AwsAccessKeyId: !Ref AwsAccessKeyId
         # AwsSecretAccessKey: !Ref AwsSecretAccessKey
     
-  subscriptionStack:
+  SubscriptionStack:
     Type: AWS::Serverless::Application
     Properties:
       Location: ./src/infrastructure/lambdas/subscription/template.yml
@@ -120,6 +120,36 @@ Resources:
         SecurityJwtHashedSecret: !Ref SecurityJwtHashedSecret
         BcryptSaltRounds: !Ref BcryptSaltRounds
         DatabaseUrl: !Ref DatabaseUrl
-        MpAcessToken: !Ref MpAcessToken
+  
+  PaymentStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./src/infrastructure/lambdas/payment/template.yml
+      Parameters:
+        NodeEnv: !Ref NodeEnv
+        SecurityJwtKey: !Ref SecurityJwtKey
+        SecurityJwtAccessExpiration: !Ref SecurityJwtAccessExpiration
+        SecurityJwtRefreshExpiration: !Ref SecurityJwtRefreshExpiration
+        SecurityJwtUserGenerator: !Ref SecurityJwtUserGenerator
+        SecurityJwtHashedSecret: !Ref SecurityJwtHashedSecret
+        BcryptSaltRounds: !Ref BcryptSaltRounds
+        DatabaseUrl: !Ref DatabaseUrl
+        MpAccessToken: !Ref MpAccessToken
+        MpPublicKey: !Ref MpPublicKey
+  
+  PlanStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./src/infrastructure/lambdas/plan/template.yml
+      Parameters:
+        NodeEnv: !Ref NodeEnv
+        SecurityJwtKey: !Ref SecurityJwtKey
+        SecurityJwtAccessExpiration: !Ref SecurityJwtAccessExpiration
+        SecurityJwtRefreshExpiration: !Ref SecurityJwtRefreshExpiration
+        SecurityJwtUserGenerator: !Ref SecurityJwtUserGenerator
+        SecurityJwtHashedSecret: !Ref SecurityJwtHashedSecret
+        BcryptSaltRounds: !Ref BcryptSaltRounds
+        DatabaseUrl: !Ref DatabaseUrl
+        MpAccessToken: !Ref MpAccessToken
         MpPublicKey: !Ref MpPublicKey
         

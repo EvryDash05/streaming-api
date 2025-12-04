@@ -13,3 +13,18 @@ export const FIND_PLAN_BY_ID_QUERY = `
     WHERE id = $1
     LIMIT 1;
 `;
+
+export const FIND_ALL_PLANS = `
+    SELECT
+        id,
+        name,
+        description,
+        price,
+        currency,
+        interval,
+        is_active,
+        created_at,
+        updated_at
+    FROM plans;`
+;
+

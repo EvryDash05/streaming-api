@@ -2,7 +2,7 @@ import databaseClient from "../../infrastructure/config/database/databaseClient"
 import DatabaseErrorHelper from "../../utils/databaseError.helper";
 import { PlanEntity } from "../entity/PlanEntity";
 import { PlanRepositoryInterface } from "./interfaces/PlanRepositoryInterface";
-import { FIND_PLAN_BY_ID_QUERY } from "./queries/planRepository.queriest";
+import { FIND_ALL_PLANS, FIND_PLAN_BY_ID_QUERY } from "./queries/planRepository.queriest";
 
 export class PlanRepository implements PlanRepositoryInterface {
 
@@ -21,8 +21,16 @@ export class PlanRepository implements PlanRepositoryInterface {
         }
     }
 
-    findAll(): Promise<PlanEntity[]> {
-        throw new Error("Method not implemented.");
+    async findAll(): Promise<PlanEntity[]> {
+        try {
+            const result = await databaseClient.query<PlanEntity[]>(
+                FIND_ALL_PLANS,
+            );
+
+            return result.rows;
+        } catch (error) {
+            throw DatabaseErrorHelper.translate(error);
+        }
     }
 
     save(entity: PlanEntity): Promise<number> {

@@ -20,7 +20,7 @@ Globals:
         LAMBDA_EXECUTION_ROLE: !Ref LambdaExecutionRole
         S3_VIDEOS_BUCKET: !Ref S3VideosBucket
         S3_REGION: !Ref S3Region
-        MP_ACCESS_TOKEN: !Ref MpAcessToken 
+        MP_ACCESS_TOKEN: !Ref MpAccessToken 
         MP_PUBLIC_KEY: !Ref MpPublicKey
 
   Api:
@@ -120,6 +120,8 @@ Resources:
         SecurityJwtHashedSecret: !Ref SecurityJwtHashedSecret
         BcryptSaltRounds: !Ref BcryptSaltRounds
         DatabaseUrl: !Ref DatabaseUrl
+        MpAccessToken: !Ref MpAccessToken
+        MpPublicKey: !Ref MpPublicKey
   
   PaymentStack:
     Type: AWS::Serverless::Application

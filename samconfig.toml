@@ -3,6 +3,18 @@ version = 0.1
 [default.build.parameters]
 region = "us-east-1"
 
+
+[default.deploy.parameters]
+stack_name = "streamin-api"
+resolve_s3 = true
+s3_prefix = "streamin-api"
+confirm_changeset = true
+capabilities = "CAPABILITY_AUTO_EXPAND CAPABILITY_IAM CAPABILITY_NAMED_IAM"
+parameter_overrides = "NodeEnv=\"production\" FrontendOrigin=\"*\" SecurityJwtKey=\"08af2447a30c9c090b3595e6b45cead32eb587dcb1892aae31f073dcb31bce95\" SecurityJwtAccessExpiration=\"1800000\" SecurityJwtRefreshExpiration=\"86400000\" SecurityJwtUserGenerator=\"management_system\" SecurityJwtHashedSecret=\"d0DMBKNAbVqoX6cT00DEpB/T5atRfONxoJpgM7o+dCM=\" BcryptSaltRounds=\"10\" DatabaseUrl=\"postgresql://neondb_owner:npg_gl0TM1HIPCAc@ep-noisy-term-ac41up1k-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require\" LambdaExecutionRole=\"arn:aws:iam::275688773775:role/lambda_s3\" S3VideosBucket=\"api-streaming-bucket\" S3Region=\"us-west-2\" MpAccessToken=\"APP_USR-2930019407197162-120412-85b27bab9e1bb939d536b7ae2dde2a3a-3039298874\" MpPublicKey=\"APP_USR-05a39199-a8ed-422f-a07e-8689118a1459\""
+image_repositories = []
+
+[default.global.parameters]
+region = "us-west-2"
 [prod.deploy.parameters]
 stack_name = "streaming-api-prod"
 resolve_s3 = true
